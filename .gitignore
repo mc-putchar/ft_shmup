@@ -1,0 +1,6 @@
+build/
+*.o
+*.d
+*.out
+en.subject.pdf
+ft_shmup
