@@ -1,0 +1,39 @@
+horizontal scrolling
+
+list of predetermined player names
+
+Player needs to deliver new exams to the vogsphere and destroy any students trying to steal them
+
+1. Story (scrolling up)
+2. Menu (New Game, Online, Settings, Credits, Quit)
+3. Player design (spaceship, maybe a few variants/colors)
+4. Enemies (Basic, Different kinds, Scripted, BOSS) (final Boss ->Bocal?)
+5. Level design (top and bottom walls, scrolling right to left)
+6. Weapons (basic laser, blaster, missile launcher, flame thrower,...)
+7. Powerups (Speed, multishooting, health, shield,...)
+8. Animations and effects (?)
+9. Multiplayer (?)
+
+Data Structures
+interfaces:
+Entity: position, size(w,h), skin, ?behaviour?
+	Player(Entity)
+	Enemy(Entity)
+	Boss(Entity)
+	
+
+Projectile: pos, dir, texture
+
+Weapon: damage(target Entity), firerate, shoot(), projectile
+
+GameState
+	- Level
+	- Player
+	- ActiveEnemies
+	
+	
+	
+enemy type:
+ - peer
+ - intern
+ - cheater
