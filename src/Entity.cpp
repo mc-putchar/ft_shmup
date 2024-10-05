@@ -10,7 +10,19 @@
 
 #include "Entity.hpp"
 
-void Entity::move(Point const& direction) {
+Entity::Entity(Point position, uint16_t hp, uint16_t sp, Texture texture,
+               Weapon* weapon)
+    : position(position),
+      health(hp),
+      shield(sp),
+      texture(texture),
+      weapon(weapon) {
+    this->width = texture.width;
+    this->height = texture.height;
+}
+
+void Entity::move(WINDOW *win, Point const& direction) {
+    (void)win;
     this->position += direction;
 }
 
@@ -41,6 +53,10 @@ uint16_t Entity::get_health() const {
 
 uint16_t Entity::get_shield() const {
     return this->shield;
+}
+
+Texture Entity::get_skin() const {
+    return this->texture;
 }
 
 void Entity::set_position(Point const& new_position) {

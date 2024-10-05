@@ -12,14 +12,15 @@
 
 #include <cstdint>
 #include <string>
+#include <curses.h>
 
 class Weapon;
 
 struct Point {
     uint16_t x;
     uint16_t y;
-    Point(uint16_t x, uint16_t y) : x(x), y(y){};
-    Point(Point const& cpy) : x(cpy.x), y(cpy.y){};
+    Point(uint16_t x, uint16_t y) : x(x), y(y) {};
+    Point(Point const& cpy) : x(cpy.x), y(cpy.y) {};
     Point& operator=(Point const& rhs) {
         if (this == &rhs)
             return *this;
@@ -52,8 +53,10 @@ struct Texture {
 
 class Entity {
   public:
+    Entity(Point position, uint16_t hp, uint16_t sp, Texture texture,
+           Weapon* weapon);
     virtual ~Entity() = default;
-    virtual void move(Point const& direction);
+    virtual void move(WINDOW *win, Point const& direction);
     virtual void take_damage(int amount);
     virtual void attack(Entity& target);
 
@@ -61,6 +64,7 @@ class Entity {
     Point get_size() const;
     uint16_t get_health() const;
     uint16_t get_shield() const;
+    Texture get_skin() const;
 
     void set_position(Point const& new_position);
     void set_health(uint16_t hp);

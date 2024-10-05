@@ -29,8 +29,10 @@ class Projectile {
 
 class Weapon {
   public:
-    Weapon();
-    Weapon(Weapon const& cpy);
+    Weapon(uint16_t cooldown, uint16_t last_shot)
+        : cooldown(cooldown), last_shot(last_shot) {};
+    Weapon(Weapon const& cpy)
+        : cooldown(cpy.cooldown), last_shot(cpy.last_shot) {};
     Weapon& operator=(Weapon const& rhs);
     ~Weapon();
     void damage(Entity& target);
