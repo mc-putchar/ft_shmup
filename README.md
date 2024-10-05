@@ -71,8 +71,18 @@
 ```
 
 
-## Introduction 
+## The challenge 
 Implement a simplistic shoot-em-up-style game in your terminal.
+
+## The Rules
+- The game should be written in C or C++.
+- We are allowed to use any function in the standard library.
+- Any clock based library.
+
+
+### Clock based library in C++
+This is a library that will provide us with what we need.
+- [chrono](https://en.cppreference.com/w/cpp/header/chrono)
 
 
 
