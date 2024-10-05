@@ -5,7 +5,7 @@ SRCDIR := src
 INCDIR := include
 BINDIR := build
 
-SRCS := main
+SRCS := main GameConfig
 
 BINS := $(SRCS:%=$(BINDIR)/%.o)
 

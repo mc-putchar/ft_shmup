@@ -13,8 +13,11 @@
 
 class GameConfig {
 public:
-	static GameConfig& getInstance() {
+	static GameConfig& getConf() {
 		static GameConfig instance;
+		// init_instance();
+		instance.storyPlayed = false;
+		instance.loadConfig();
 		return instance;
 	}
 	GameConfig(const GameConfig&) = delete;
@@ -24,13 +27,13 @@ public:
 	int setCols(int cols);
 	int setFrameRate(int frameRate);
 	int getFPS();
-	void load_config(void);
+	void loadConfig(void);
 	void write_config(void);
 
+	bool storyPlayed;
 
 	private:
 	GameConfig() : storyPlayed(false), rows(0), cols(0), frameRate(60.0) {}
-	bool storyPlayed;
 	int rows;
 	int cols;
 	int frameRate;
