@@ -28,4 +28,21 @@ void GameConfig::loadConfig()
 		}
 	}
 	file.close();
+
+}
+
+void GameConfig::loadStory()
+{
+	ifstream file("logo.txt");
+	if (!file.is_open())
+	{
+		cerr << "error opening config file" << endl;
+		return;
+	}
+	string line;
+	while (getline(file, line))
+	{
+		intro.push_back(line);
+	}
+	file.close();
 }
