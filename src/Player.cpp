@@ -9,6 +9,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "Player.hpp"
+#include <curses.h>
 #include <iostream>
 
 Player::Player(Point start_pos, uint16_t hp, uint16_t sp, Texture texture)
@@ -58,7 +59,18 @@ void Player::attack(Entity& target) {
 
 void Player::take_damage(int amount) {}
 
-void Player::move(WINDOW *win, Point const& direction) {
+void Player::move(WINDOW* win, Point const& direction) {
+    uint16_t mw, mh;
+    getmaxyx(win, mh, mw);
+    mvwprintw(win, 5, 5, "max: %d %d, pos: %d %d\n", mw, mh, this->position.x,
+              this->position.y);
+    if (this->position.x + direction.x + this->texture.width >= mw ||
+        this->position.x + direction.x <= 0 ||
+        this->position.y + direction.y + this->texture.height >= mh ||
+        this->position.y + direction.y <= 0) {
+        this->_display(win);
+        return;
+    }
     this->position += direction;
     this->_display(win);
 }
@@ -66,8 +78,9 @@ void Player::move(WINDOW *win, Point const& direction) {
 void Player::_display(WINDOW* win) const {
     uint16_t cursor = 0;
     for (uint16_t row = 0; row < this->texture.height; ++row) {
-        mvwprintw(win, this->position.y + row, this->position.x, "%s",
-                  this->texture.data.substr(cursor, this->texture.width).c_str());
+        mvwprintw(
+            win, this->position.y + row, this->position.x, "%s",
+            this->texture.data.substr(cursor, this->texture.width).c_str());
         cursor += this->texture.width;
     }
 }

@@ -17,9 +17,9 @@
 class Weapon;
 
 struct Point {
-    uint16_t x;
-    uint16_t y;
-    Point(uint16_t x, uint16_t y) : x(x), y(y) {};
+    int16_t x;
+    int16_t y;
+    Point(int16_t x, int16_t y) : x(x), y(y) {};
     Point(Point const& cpy) : x(cpy.x), y(cpy.y) {};
     Point& operator=(Point const& rhs) {
         if (this == &rhs)
@@ -31,6 +31,11 @@ struct Point {
     Point& operator+=(Point const& p) {
         this->x += p.x;
         this->y += p.y;
+        return *this;
+    };
+    Point& operator-=(Point const& p) {
+        this->x -= p.x;
+        this->y -= p.y;
         return *this;
     };
 };
