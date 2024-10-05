@@ -10,6 +10,35 @@
 
 #include "Entity.hpp"
 
+Entity::Entity(Point const& position, Point const& size, uint16_t hp,
+               uint16_t sp, Texture const& texture)
+    : position(position),
+      width(size.x),
+      height(size.y),
+      health(hp),
+      shield(sp),
+      texture(texture) {}
+
+Entity::Entity(Entity const& cpy)
+    : position(cpy.position),
+      width(cpy.width),
+      height(cpy.height),
+      health(cpy.health),
+      shield(cpy.shield),
+      texture(cpy.texture) {}
+
+Entity& Entity::operator=(Entity const& rhs) {
+    if (this == &rhs)
+        return *this;
+    this->position = rhs.position;
+    this->height = rhs.height;
+    this->width = rhs.width;
+    this->health = rhs.health;
+    this->shield = rhs.shield;
+    this->texture = rhs.texture;
+    return *this;
+}
+
 void Entity::move(Point const& direction) {
     this->position += direction;
 }

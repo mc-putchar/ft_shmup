@@ -36,7 +36,9 @@ struct Point {
 
 struct Texture {
     Texture(uint16_t w, uint16_t h, std::string const& data)
-        : width(w), height(h), data(data) {}
+        : width(w), height(h), data(data){};
+    Texture(Texture const& cpy)
+        : width(cpy.width), height(cpy.height), data(cpy.data){};
     Texture& operator=(Texture const& rhs) {
         if (this == &rhs)
             return *this;
@@ -52,6 +54,10 @@ struct Texture {
 
 class Entity {
   public:
+    Entity(Point const& position, Point const& size, uint16_t hp, uint16_t sp,
+           Texture const& texture);
+    Entity(Entity const& cpy);
+    Entity& operator=(Entity const& rhs);
     virtual ~Entity() = default;
     virtual void move(Point const& direction);
     virtual void take_damage(int amount);
