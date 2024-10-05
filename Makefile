@@ -20,7 +20,6 @@ all: $(NAME)
 
 $(NAME): $(BINS)
 	$(CXX) $(CXXFLAGS) -o $(NAME) $(CPPFLAGS) $(BINS) $(LDFLAGS)
-	alacritty --config-file alacritty_config.toml --command $(NAME)
 
 $(BINDIR)/%.o: $(SRCDIR)/%.cpp | $(BINDIR)
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
