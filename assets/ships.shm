@@ -1,0 +1,103 @@
+
+#  >L-\___  
+# ~XE[]==0}>
+#  >F-/```  
+{
+	"class": "executive",
+	"size": "small",
+	"hullpoints": 6,
+	"speed": 7,
+	"agility": 7,
+	"num_states": 3,
+	"states": [
+		{
+			"name": "off",
+			"width": 10,
+			"height": 3,
+			"hull": " >L-\___   XE[]==O}> >F-/```  "
+		},
+		{
+			"name": "idle",
+			"width": 10,
+			"height": 3,
+			"hull": " >L-\___  ~XE[]==O}> >F-/```  "
+		},
+		{
+			"name": "turbo",
+			"width": 10,
+			"height": 3,
+			"hull": "~>L-\___  ~XE[]==O}>~>F-/```  "
+		}
+	],
+	"names": ["exec V1", "MillionAir", "TiG eXpress", "Snap Wyvern",
+		"Calculatoreal", "Bee's Knees"],
+},
+
+#  /=    
+# ~>--{H}
+#  \=    
+{
+	"class": "hunter",
+	"size": "small",
+	"hullpoints": 3,
+	"speed": 8,
+	"agility": 9,
+	"num_states": 3,
+	"states": [
+		{
+			"name": "off",
+			"width": 6,
+			"height": 3,
+			"hull": " /=     >--{H} \=    "
+		},
+		{
+			"name": "idle",
+			"width": 6,
+			"height": 3,
+			"hull": " /=    ~>--{H} \=    "
+		},
+		{
+			"name": "turbo",
+			"width": 6,
+			"height": 3,
+			"hull": ",/=    &>--{H}`\=    "
+		}
+	],
+	"names": ["Scharf Schooter", "Beagle Eye", "Massquito"],
+},
+
+# ~>:::`\     
+#  /```\ |A\  
+#  I=[ ][=]OG!
+#  I=[ ][=]Ug;
+#  \___/ |V/  
+# ~>:::_/     
+{
+	"class": "guardian",
+	"size": "medium",
+	"hullpoints": 8,
+	"speed": 6,
+	"agility": 6,
+	"num_states": 3,
+	"states": [
+		{
+			"name": "off",
+			"width": 12,
+			"height": 6,
+			"hull": " >:::`\      /```\ |A\   I=[ ][=]OG! I=[ ][=]Ug; \___/ |V/   >:::_/     "
+		},
+		{
+			"name": "idle",
+			"width": 12,
+			"height": 6,
+			"hull": "~>:::`\      /```\ |A\   I=[ ][=]OG! I=[ ][=]Ug; \___/ |V/  ~>:::_/     "
+		},
+		{
+			"name": "turbo",
+			"width": 12,
+			"height": 6,
+			"hull": "~>:::`\      /```\ |A\  ~X=[ ][=]OG!~X=[ ][=]Ug; \___/ |V/  ~>:::_/     "
+		}
+	],
+	"names": ["Red Gnome", "AntiVirus", "Bread Knot"],
+},
