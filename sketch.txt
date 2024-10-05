@@ -1,39 +1,68 @@
-horizontal scrolling
+42
+Fantastic Trio
+FT_
+SHMUP
 
-list of predetermined player names
+game = horizontal/vertical scrolling shoot'em up
 
-Player needs to deliver new exams to the vogsphere and destroy any students trying to steal them
+player = list of predetermined player names
+ship_name = random from the ship class
 
-1. Story (scrolling up)
-2. Menu (New Game, Online, Settings, Credits, Quit)
+Story = 
+\ player flies ship_name on the way out of Haupt Orbitalen Station Hangar 42-b |
+	\ Mission is a delivery pickup from the Noveau Exams Fabrique d'Parisphere |
+		\ and bringing the encrypted packages safely back home to Vogsteroid.  |
+			\ player is the unstoppable force of universe sworn to protect the |
+				\ integrity of Undefined Beliefor and will delete any entities |
+					\ that allocate themselves between player and mission goal |
+						\ Promised reward is allegedly many Tons in Gold (TiG) |
+							\ stakes are high and risk of dangers even higher. |
+								\ 'What could go wrong?', this is the answer.  |
+
+Opening:
+1. Story (scrolling up-left)
+2. Menu {
+		New Game [solo, split?, online?],
+		Guide [basic controls],
+		High Scores [top 10 player scores],
+		Settings [graphics, keybinds], => .conf file
+		Credits,
+		Quit (or SIGINT/SIGTERM)
+	}
 3. Player design (spaceship, maybe a few variants/colors)
 4. Enemies (Basic, Different kinds, Scripted, BOSS) (final Boss ->Bocal?)
 5. Level design (top and bottom walls, scrolling right to left)
-6. Weapons (basic laser, blaster, missile launcher, flame thrower,...)
-7. Powerups (Speed, multishooting, health, shield,...)
+6. Weapons (basic laser, rail blaster, missile launcher, flame thrower, ...)
+7. Pickups (Turbo, Multishoot, Health, Shield, TiG coins, Virus, Worm, ...)
 8. Animations and effects (?)
 9. Multiplayer (?)
 
 Data Structures
-interfaces:
-Entity: position, size(w,h), skin, ?behaviour?
+
+Interfaces:
+
+Entity: position, size(w,h), texture set, ?behaviour?
 	Player(Entity)
 	Enemy(Entity)
 	Boss(Entity)
-	
+	Pickup(Entity)
 
 Projectile: pos, dir, texture
 
 Weapon: damage(target Entity), firerate, shoot(), projectile
 
-GameState
-	- Level
+
+GameState:
+	- Level Scenario
+	- Status
 	- Player
 	- ActiveEnemies
-	
-	
-	
-enemy type:
+	- Projectiles
+	- Map
+
+
+Enemy types:
+ - pisciner
  - peer
  - intern
  - cheater
