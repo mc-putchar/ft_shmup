@@ -4,3 +4,4 @@ build/
 *.out
 en.subject.pdf
 ft_shmup
+.vscode/
