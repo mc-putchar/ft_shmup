@@ -10,7 +10,8 @@ SRCS := main
 BINS := $(SRCS:%=$(BINDIR)/%.o)
 
 CXX := c++
-CXXFLAGS := -Wall -Wextra -Werror -std=c++11
+CXXFLAGS := -Wall -Wextra 
+# CXXFLAGS := -Werror -std=c++11
 CPPFLAGS := -I$(INCDIR)
 LDFLAGS := -lncurses
 
