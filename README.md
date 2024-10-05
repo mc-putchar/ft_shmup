@@ -69,3 +69,16 @@
    \__/      \__/                                                                     \__/      \__/      
                                                                                                           
 ```
+
+
+## Introduction 
+Implement a simplistic shoot-em-up-style game in your terminal.
+
+
+
+## Links
+Gradius - NES Gameplay:  
+https://youtu.be/MtgDe2lBcYc?si=dT_5m1i_nc-bOWCf  
+
+R Type gameplay (PC Game, 1987)  
+https://youtu.be/UFHzPfCG-DU?si=CLq-gcE1AI509Oxi  
