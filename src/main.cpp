@@ -1,57 +1,70 @@
-#include <curses.h>
+
 #include <iostream>
 #include <chrono>
 #include <thread>
-
-
+#include <cstdio>
+#include <ncurses.h>
+#include <cstdlib> // for system()
 
 using namespace std;
 
-int main(int ac, char **av) {
-  if (ac > 1)
-    std::cout << "Usage: " << av[0] << std::endl;
-  (void) initscr();
-
-//   resizeterm(125, 280);
-
-  // allow colors
-  start_color();
-
-  init_pair(1, COLOR_CYAN, COLOR_BLACK); // color pair 1
-  keypad(stdscr, TRUE); // enable function and cursor keys
-  (void) nonl();  // do not add newline when pressing enter
-  (void) cbreak(); // do not buffer input
-  noecho(); // do not echo input
 
 
-  while (1) {
-	auto startTime = std::chrono::high_resolution_clock::now();
+int main(int ac, char **av)
+{
+	if (ac > 1)
+		std::cout << "Usage: " << av[0] << std::endl;
+
+	(void)initscr();
 	int rows, cols;
-    getmaxyx(stdscr, rows, cols);
-	mvwprintw(stdscr, 0, cols - 10, "fps 60");
-    int c = getch();
-    // printw("Pressed: %d\n", c);
-    attron(COLOR_PAIR(1));
-	mvwprintw(stdscr, 0, 0, "Pressed: %d", c);
-	attroff(COLOR_PAIR(1));
+	// int frameCount = 0;
+	double fps = 60.0;
+	auto startTime = chrono::high_resolution_clock::now();
+	// auto lastTime = startTime;
+	// resizeterm(125, 280);
 
-	if (c == 27)
-	  break;
+	// allow colors
+	start_color();
 
-	auto endTime = std::chrono::high_resolution_clock::now();
-	chrono::duration<double> elapsedTime = endTime - startTime;
+	init_pair(1, COLOR_CYAN, COLOR_BLACK); // color pair 1
+	keypad(stdscr, TRUE);				   // enable function and cursor keys
+	(void)nonl();						   // do not add newline when pressing enter
+	(void)cbreak();						   // do not buffer input
+	noecho();							   // do not echo input
 
-	chrono::duration<double> remainingTime = chrono::duration<double>(1.0/60.0) - elapsedTime;
-	
-	if (remainingTime > chrono::duration<double>(0.0)) {
-		this_thread::sleep_for(remainingTime);
+	while (1)
+	{
+		getmaxyx(stdscr, rows, cols);
+
+		char fpsStr[10];
+		snprintf(fpsStr, sizeof(fpsStr), "fps %.2f", fps);
+		mvwprintw(stdscr, 0, cols - 10, "%s", fpsStr);
+		
+		int c = getch();
+
+		attron(COLOR_PAIR(1));
+		mvwprintw(stdscr, 0, 0, "Pressed: %d", c);
+		attroff(COLOR_PAIR(1));
+
+		if (c == 27)
+			break;
+
+
+
+
+		auto endTime = std::chrono::high_resolution_clock::now();
+		chrono::duration<double> elapsedTime = endTime - startTime;
+		chrono::duration<double> remainingTime = chrono::duration<double>(1.0 / 60.0) - elapsedTime;
+		if (remainingTime > chrono::duration<double>(0.0))
+		{
+			this_thread::sleep_for(remainingTime);
+		}
+		else
+		{
+			mvwprintw(stdscr, 0, cols - 10, "fps ...");
+		}
 	}
-	else {
-		mvwprintw(stdscr, 0, cols - 10, "fps ...");
-	}
 
-  }
-
-  endwin();
-  return (0);
+	endwin();
+	return (0);
 }

@@ -20,12 +20,12 @@ class GameConfig {
 	int setFrameRate(int frameRate);
 	int getFPS();
 
-	load_config();
-	write_config();
+	void load_config(void);
+	void write_config(void);
 
-	bool storyPlayed;
 
 	private:
+	bool storyPlayed;
 	int rows;
 	int cols;
 	int frameRate;
