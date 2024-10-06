@@ -86,10 +86,10 @@ int main(int ac, char** av) {
 
     while (true) {
         Texture skin(10, 3, "~>L-\\___  ~XE[]==O}>~>F-/```  ");
-        Player p(Point(1, 15), 3, 0, skin);
+        Player p(Point(1, 15), 5, 0, skin);
         Texture bullet_tex(1, 1, "-");
         Texture laser_icon(3, 3, ",_,|!|```");
-        Weapon* laser = new Weapon(laser_icon, 1000, 1, bullet_tex, 3);
+        Weapon* laser = new Weapon(laser_icon, 30, 1, bullet_tex, 3);
         p.set_weapon(laser);
         g_score = 0;
 
@@ -127,11 +127,12 @@ static void game_loop(Game& world, Player& p) {
              it != world.enemies.end(); ++it) {
             Enemy* enemy = dynamic_cast<Enemy*>(&(*it));
             if (enemy) {
-                enemy->update(world.bullets, i);
-                wattron(world.main,
-                        COLOR_PAIR(3));  // Assuming color pair 2 is red
+                enemy->update(world.bullets, i, COLS);
+                wattron(
+                    world.main,
+                    COLOR_PAIR(3) | A_BOLD);  // Assuming color pair 2 is red
                 put_entity(world.main, *enemy);
-                wattroff(world.main, COLOR_PAIR(3));
+                wattroff(world.main, COLOR_PAIR(3) | A_BOLD);
             }
         }
         init_pair(4, COLOR_WHITE, COLOR_MAGENTA);  // Define gray color pair
@@ -143,7 +144,7 @@ static void game_loop(Game& world, Player& p) {
             wattroff(world.main, COLOR_PAIR(4));
         }
         for (auto bullet : world.bullets) {
-            if (!bullet->active) {
+            if (bullet && !bullet->active) {
                 world.bullets.erase(std::remove(world.bullets.begin(),
                                                 world.bullets.end(), bullet),
                                     world.bullets.end());
@@ -198,6 +199,7 @@ static void game_loop(Game& world, Player& p) {
         if (check_for_collision(world, p) == 1) {
             p.set_health(p.get_health() - 1);
             if (p.get_health() == 0) {
+                display_hud(world, p);
                 for (auto bullet : world.bullets)
                     delete bullet;
                 world.bullets.clear();

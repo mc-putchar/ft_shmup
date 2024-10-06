@@ -8,6 +8,7 @@
 //      ########## ###    #### ########## ###       ###   ###                 //
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <cstdint>
 #include <iostream>
 #include <vector>
 
@@ -32,28 +33,28 @@ Enemy& Enemy::operator=(Enemy const& rhs) {
     return *this;
 }
 
-Enemy::~Enemy() {}
+Enemy::~Enemy() {
+    if (this->weapon)
+        delete this->weapon;
+}
 
-void Enemy::fire() {
-    if (this->weapon) {
-        (void)this->weapon->shoot(this->direction,
-                                  this->position - Point(-1, 0), 0);
+void Enemy::fire(std::vector<Projectile*>& bullets, int frame) {
+    Point firepos;
+    firepos.x = this->position.x - 3;
+    firepos.y = this->position.y + this->texture.height / 2;
+    Projectile* p = this->weapon->shoot(Point(-1, 0), firepos, frame);
+    if (p) {
+        bullets.push_back(p);
     }
 }
 
-void Enemy::update(std::vector<Projectile*>& bullets, int frame) {
+void Enemy::update(std::vector<Projectile*>& bullets, int frame, int16_t x) {
     if (++this->ticks < 10)
         return;
     this->ticks = 0;
     this->Entity::repos();
-    if (this->weapon) {
-        Point firepos;
-        firepos.x = this->position.x - 3;
-        firepos.y = this->position.y + this->texture.height / 2;
-        Projectile* p = this->weapon->shoot(Point(-1, 0), firepos, frame);
-        if (p) {
-            bullets.push_back(p);
-        }
+    if (this->position.x < x && this->weapon) {
+        this->fire(bullets, frame);
     }
 }
 
@@ -68,28 +69,30 @@ void Enemy::create_enemies(std::vector<Enemy>& enemies, int n) {
     // ```
     Texture bullet_tex(1, 1, "-");
     Texture laser_icon(3, 3, ",_,|!|```");
-    Weapon laser(laser_icon, 1000, 1, bullet_tex, 3);
     Texture pisciner_tex(7, 1, " (0){~ ");
     Texture peer_tex(5, 3, " -\\  <=B~  -/  ");
-    int16_t x(180);
+    int16_t x(150);
     Point dir(-1, 0);
     for (int i = 0; i < n; ++i) {
+        Weapon* laser = new Weapon(laser_icon, 200, 1, bullet_tex, 2);
         Point p(x, ((i / 10) & 1) ? 10 : 20);
         Enemy enemy(p, 3, 0, pisciner_tex);
         enemy.set_direction(dir);
-        Pisciner& pisciner = static_cast<Pisciner&>(enemy);
-        pisciner.set_weapon(&laser);
+        // Pisciner& pisciner = static_cast<Pisciner&>(enemy);
+        enemy.set_weapon(laser);
         enemies.push_back(enemy);
-        x += 25;
+        x += 22;
     }
-    x = 240;
+    x = 200;
+    Weapon* laser;
     for (int i = 0; i < n / 2; ++i) {
         Point p(x, (i & 1) ? 5 : ((i & 3) ? 15 : 10));
         Enemy enemy(p, 5, 0, peer_tex);
         enemy.set_direction(dir);
-        Peer& peer = static_cast<Peer&>(enemy);
-        peer.set_weapon(&laser);
+        // Peer& peer = static_cast<Peer&>(enemy);
+        laser = new Weapon(laser_icon, 100, 1, bullet_tex, 2);
+        enemy.Entity::set_weapon(laser);
         enemies.push_back(enemy);
-        x += 50;
+        x += 45;
     }
 }

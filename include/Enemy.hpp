@@ -26,8 +26,9 @@ class Enemy : public Entity {
     Enemy& operator=(Enemy const& rhs);
     ~Enemy();
 
-    virtual void fire();
-    virtual void update(std::vector<Projectile*>& bullets, int frame);
+    virtual void fire(std::vector<Projectile*>& bullets, int frame);
+    virtual void update(std::vector<Projectile*>& bullets, int frame,
+                        int16_t x);
     virtual void die();
     static void create_enemies(std::vector<Enemy>& enemies, int n);
     bool operator==(const Enemy& other) const {

@@ -62,6 +62,9 @@ void put_entity(WINDOW* win, Entity const& entity) {
     Point p(entity.get_position());
     Point s(entity.get_size());
     char const* tex(entity.get_texture().data.c_str());
+    if (p.x + s.x >= COLS) {
+        s.x = COLS - p.x;
+    }
     for (uint16_t i = 0; i < s.y; ++i) {
         mvwprintw(win, p.y + i, p.x, "%.*s", s.x, &(tex[i * s.x]));
     }

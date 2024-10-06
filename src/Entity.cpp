@@ -9,16 +9,18 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "Entity.hpp"
+#include "Weapon.hpp"
 
-Entity::Entity(Point const& position, uint16_t hp,
-               uint16_t sp, Texture const& texture)
+Entity::Entity(Point const& position, uint16_t hp, uint16_t sp,
+               Texture const& texture)
     : position(position),
       direction(),
       width(texture.width),
       height(texture.height),
       health(hp),
       shield(sp),
-      texture(texture) {}
+      texture(texture),
+      weapon(nullptr) {}
 
 Entity::Entity(Entity const& cpy)
     : position(cpy.position),
@@ -27,18 +29,24 @@ Entity::Entity(Entity const& cpy)
       height(cpy.height),
       health(cpy.health),
       shield(cpy.shield),
-      texture(cpy.texture) {}
+      texture(cpy.texture),
+      weapon(nullptr) {
+        if (cpy.weapon) {
+            this->weapon = new Weapon(*cpy.weapon);
+        }
+      }
 
 Entity& Entity::operator=(Entity const& rhs) {
     if (this == &rhs)
         return *this;
     this->position = rhs.position;
-	this->direction = rhs.direction;
+    this->direction = rhs.direction;
     this->height = rhs.height;
     this->width = rhs.width;
     this->health = rhs.health;
     this->shield = rhs.shield;
     this->texture = rhs.texture;
+    this->weapon = rhs.weapon;
     return *this;
 }
 
@@ -104,6 +112,7 @@ void Entity::set_texture(Texture const& texture) {
 }
 
 void Entity::set_weapon(Weapon* new_weapon) {
-    // TODO: should we free previous weapon?
+    // if (this->weapon)
+    //     delete this->weapon;
     this->weapon = new_weapon;
 }
