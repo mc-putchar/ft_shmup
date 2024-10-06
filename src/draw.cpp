@@ -15,6 +15,8 @@ void init_screen(Game& game) {
     nonl();
     cbreak();
     noecho();
+    start_color();                          // allow colors
+    init_pair(1, COLOR_CYAN, COLOR_BLACK);  // color pair 1
     getmaxyx(stdscr, sx, sy);
     game.main = subwin(stdscr, sy / 2, sx, 0, 0);
     game.hud = subwin(stdscr, sy / 2, sx, sy / 2, sx);
