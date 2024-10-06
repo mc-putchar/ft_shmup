@@ -54,13 +54,13 @@ void put_projectile(WINDOW* win, Projectile* p) {
 
     getmaxyx(win, sy, sx);
     Point pos(p->get_position());
-    if (pos.y < 0 || pos.y >= sx || pos.x < 0 || pos.x >= sy) {
+    if (pos.x < 0 || pos.x >= sx || pos.y < 0 || pos.y >= sy) {
         p->active = false;
         return;
     }
     Point size(p->get_size());
     char const* tex(p->get_texture().data.c_str());
     for (uint16_t i = 0; i < size.y; ++i) {
-        mvwprintw(win, pos.x, pos.y, "%.*s", size.x, &(tex[i * size.x]));
+        mvwprintw(win, pos.y, pos.x, "%.*s", size.x, &(tex[i * size.x]));
     }
 }

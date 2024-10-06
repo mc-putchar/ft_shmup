@@ -56,11 +56,11 @@ Player::~Player() {
 void Player::fire(std::vector<Projectile*>& bullets, int frame) {
     Point firepoint;
 
-    firepoint.x = this->position.y + (this->texture.height / 2);
-    firepoint.y = this->position.x + this->texture.width;
+    firepoint.y = this->position.y + (this->texture.height / 2);
+    firepoint.x = this->position.x + this->texture.width;
     if (this->weapon) {
         Projectile* bullet =
-            this->weapon->shoot(Point(0, 1), firepoint, frame);
+            this->weapon->shoot(Point(1, 0), firepoint, frame);
         if (bullet)
             bullets.push_back(bullet);
     }
@@ -70,7 +70,9 @@ void Player::attack(Entity& target) {
     (void)target;
 };
 
-void Player::take_damage(int amount) {}
+void Player::take_damage(int amount) {
+    (void)amount;
+}
 
 void Player::move(Game const& world, Point const& direction) {
     uint16_t mw, mh;

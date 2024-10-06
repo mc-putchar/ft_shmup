@@ -25,6 +25,7 @@ class Projectile {
     Point const& get_position() const;
     Point const& get_direction() const;
     Point get_size() const;
+    int16_t get_damage() const;
     uint16_t get_speed() const;
     Texture get_texture() const;
 

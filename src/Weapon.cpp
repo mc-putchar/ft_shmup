@@ -36,6 +36,10 @@ Point Projectile::get_size() const {
     return Point(this->texture.width, this->texture.height);
 }
 
+int16_t Projectile::get_damage() const {
+    return this->damage;
+}
+
 uint16_t Projectile::get_speed() const {
     return this->speed;
 }
