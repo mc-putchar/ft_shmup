@@ -83,7 +83,7 @@ int main(int ac, char** av) {
     // mvwprintw(stdscr, 0, 1, "ft_shmup");
     refresh();
     if (world.status == STORY) {
-        display_story(config, LINES, COLS);
+        // display_story(config, LINES, COLS);
         world.status = MENU;
     }
     init_windows(world);
@@ -97,18 +97,8 @@ int main(int ac, char** av) {
     Texture laser_icon(3, 3, ",_,|!|```");
     Weapon *laser = new Weapon(laser_icon, 1000, 1, bullet_tex, 3);
     p.set_weapon(laser);
-    // p.current_regions.clear();  // Clear current regions before updating
-    // for (Region r : world.regions) {
-    //     if (true || r.is_point_inside(p.get_position())) {
-    //         p.current_regions.push_back(r);
-    //     }
-    // }
-    // refresh();
-    // wrefresh(world.main);
-    // (void)wgetch(world.main);
 
     game_loop(world, p);
-
     return 0;
 }
 

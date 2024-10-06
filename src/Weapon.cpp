@@ -109,8 +109,8 @@ void Weapon::do_damage(Entity& target) {
 }
 
 Projectile* Weapon::shoot(Point const& dir, Point const& start, uint32_t time) {
-    if (static_cast<uint32_t>(this->cooldown) > time - this->last_shot)
-        return nullptr;
+    // if (static_cast<uint32_t>(this->cooldown) > time - this->last_shot)
+    //     return nullptr;
     this->last_shot = time;
     return new Projectile(this->projectile_texture, start, dir,
                 this->projectile_damage,
