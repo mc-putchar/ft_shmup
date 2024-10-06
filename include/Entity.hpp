@@ -18,6 +18,7 @@ class Weapon;
 struct Point {
     uint16_t x;
     uint16_t y;
+    Point() : x(0), y(0) {};
     Point(uint16_t x, uint16_t y) : x(x), y(y){};
     Point(Point const& cpy) : x(cpy.x), y(cpy.y){};
     Point& operator=(Point const& rhs) {
@@ -59,16 +60,20 @@ class Entity {
     Entity(Entity const& cpy);
     Entity& operator=(Entity const& rhs);
     virtual ~Entity() = default;
-    virtual void move(Point const& direction);
+
+    virtual void move(void);
     virtual void take_damage(int amount);
     virtual void attack(Entity& target);
 
     Point const& get_position() const;
+    Point const& get_direction() const;
     Point get_size() const;
     uint16_t get_health() const;
     uint16_t get_shield() const;
+    std::string const& get_texture() const;
 
     void set_position(Point const& new_position);
+    void set_direction(Point const& new_direction);
     void set_health(uint16_t hp);
     void set_shield(uint16_t sp);
     void set_skin(Texture const& skin);
@@ -76,6 +81,7 @@ class Entity {
 
   protected:
     Point position;
+    Point direction;
     uint16_t width;
     uint16_t height;
     uint16_t health;

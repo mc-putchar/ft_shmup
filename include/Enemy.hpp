@@ -11,6 +11,12 @@
 #pragma once
 
 #include "Entity.hpp"
+#include "Weapon.hpp"
+
+#define ROCKET	"🚀"
+#define PISCINER	"🤿"
+
+enum e_state { SPAWNING, IDLE, ACTIVE, ATTACKING, DEFENDING, HURT, DEAD };
 
 class Enemy : public Entity {
   public:
@@ -20,8 +26,13 @@ class Enemy : public Entity {
     Enemy& operator=(Enemy const& rhs);
     ~Enemy();
 
-    virtual void attack(Entity& target) = 0;
-    virtual void update() = 0;
+    virtual void attack(Entity& target);
+    virtual void fire();
+    virtual void update();
+    virtual void die();
+
+  protected:
+    e_state state;
 
   private:
 };
