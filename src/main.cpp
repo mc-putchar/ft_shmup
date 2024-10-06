@@ -11,6 +11,7 @@
 pthread_mutex_t key_pressed_mtx = PTHREAD_MUTEX_INITIALIZER;
 
 static void game_loop(Game& world, Player& p);
+static int initialize_world(Game& world);
 
 int main(int ac, char** av) {
     if (ac > 1)
@@ -18,13 +19,19 @@ int main(int ac, char** av) {
 
     Game world;
     init_screen(world);
-    mvwprintw(stdscr, 1, 1, "Hello, world!");
-    refresh();
-    wrefresh(world.main);
+    initialize_world(world);
 
     Texture skin(10, 3, "~>L-\\___  ~XE[]==O}>~>F-/```  ");
-    Player p(Point(20, 20), 10, 10, skin);
-    p.move(world.main, Point(0, 0));  // Draw player at start position
+    Player p(Point(1, 15), 10, 10, skin);
+    p.current_regions.clear();  // Clear current regions before updating
+    for (Region r : world.regions) {
+        if (true || r.is_point_inside(p.get_position())) {
+            p.current_regions.push_back(r);
+        }
+    }
+    // refresh();
+    // wrefresh(world.main);
+    // (void)wgetch(world.main);
 
     game_loop(world, p);
 
@@ -48,19 +55,19 @@ static void game_loop(Game& world, Player& p) {
         switch (ch) {
             case 'w':
                 mvwprintw(world.main, 10, 40, "KEY_UP");
-                p.move(world.main, Point(0, -1));
+                p.move(world, Point(0, -1));
                 break;
             case 's':
                 mvwprintw(world.main, 10, 40, "KEY_DOWN");
-                p.move(world.main, Point(0, 1));
+                p.move(world, Point(0, 1));
                 break;
             case 'a':
                 mvwprintw(world.main, 10, 40, "KEY_LEFT");
-                p.move(world.main, Point(-1, 0));
+                p.move(world, Point(-1, 0));
                 break;
             case 'd':
                 mvwprintw(world.main, 10, 40, "KEY_RIGHT");
-                p.move(world.main, Point(1, 0));
+                p.move(world, Point(1, 0));
                 break;
             case 10:  // Enter key
                 break;
@@ -68,18 +75,54 @@ static void game_loop(Game& world, Player& p) {
                 cleanup_and_exit();
                 break;
             default:
-                p.move(world.main, Point(0, 0));
+                p.move(world, Point(0, 0));
                 wborder(world.main, 0, 0, 0, 0, 0, 0, 0, 0);
                 wborder(world.hud, 0, 0, 0, 0, 0, 0, 0, 0);
                 break;
         }
         // }
+        if (p.current_regions.empty()) {
+            mvwprintw(world.hud, 1, 1, "Player is not in any region");
+        } else {
+            std::string regions_str = "Player regions: ";
+            for (Region region : p.current_regions) {
+                regions_str += std::to_string(region.id) + " ";
+            }
+            mvwprintw(world.hud, 1, 1, regions_str.c_str());
+        }
+        int row = 1;  // Start displaying regions from the second row
+        for (const Region& region : world.regions) {
+            mvwprintw(world.hud, row++, 40, "Region %d: (%d, %d) - (%d, %d)",
+                      region.id, region.origin_x, region.origin_y,
+                      region.origin_x + region.width,
+                      region.origin_y + region.height);
+            if (row >= 7) {
+                break;
+            }
+        }
         refresh();
         wrefresh(world.main);
         wrefresh(world.hud);
         usleep(10000);  // Sleep for 20ms
         i++;
     }
+}
+
+static int initialize_world(Game& world) {
+    uint16_t mw, mh;
+    uint16_t rg_height, rg_width;
+    getmaxyx(world.main, mh, mw);
+    rg_height = mh / 4;
+    rg_width = mw / 4;
+    for (int i = 0; i < 16; ++i) {
+        Region curr = Region(i);
+        curr.width = rg_width;
+        curr.height = rg_height;
+        curr.origin_x = rg_width * (i % 4);
+        curr.origin_y = rg_height * (i % 4);
+        world.regions.push_back(curr);
+    }
+    return (0);
 }
 
 int cleanup_and_exit(void) {

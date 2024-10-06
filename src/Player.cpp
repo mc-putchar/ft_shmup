@@ -65,20 +65,43 @@ void Player::attack(Entity& target) {
 
 void Player::take_damage(int amount) {}
 
-void Player::move(WINDOW* win, Point const& direction) {
+void Player::move(Game const& world, Point const& direction) {
     uint16_t mw, mh;
-    getmaxyx(win, mh, mw);
-    mvwprintw(win, 5, 5, "max: %d %d, pos: %d %d\n", mw, mh, this->position.x,
-              this->position.y);
+    getmaxyx(world.main, mh, mw);
     if (this->position.x + direction.x + this->texture.width >= mw ||
         this->position.x + direction.x <= 0 ||
         this->position.y + direction.y + this->texture.height >= mh ||
         this->position.y + direction.y <= 0) {
-        this->_display(win);
+        this->_display(world.main);
         return;
     }
     this->position += direction;
-    this->_display(win);
+    if (this->current_regions.size() > 0) {
+        this->current_regions.clear();
+        for (Region& r : this->current_regions) {
+            if (!r.is_point_inside(this->position)) {
+                for (Region adj : r.get_adjacent_regions(world)) {
+                    if (adj.is_point_inside(this->position)) {
+                        this->current_regions.push_back(adj);
+                    } else if (adj.is_point_inside(
+                                   this->position +
+                                   Point(0, this->texture.height))) {
+                        this->current_regions.push_back(adj);
+                    } else if (adj.is_point_inside(
+                                   this->position +
+                                   Point(this->texture.width, 0))) {
+                        this->current_regions.push_back(adj);
+                    } else if (adj.is_point_inside(
+                                   this->position +
+                                   Point(this->texture.width,
+                                         this->texture.height))) {
+                        this->current_regions.push_back(adj);
+                    }
+                }
+            }
+        }
+    }
+    this->_display(world.main);
 }
 
 void Player::_display(WINDOW* win) const {
