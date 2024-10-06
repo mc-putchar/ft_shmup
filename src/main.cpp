@@ -72,7 +72,6 @@ typedef struct {
 
 void fillBackground(WINDOW *my_pad)
 {
-
 	for (int y = 1; y < LINES; ++y) {
         for (int x = 0; x < COLS * 2; ++x) {
 			int colorPair = 1 + rand() % 3;
