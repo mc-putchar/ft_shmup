@@ -15,7 +15,7 @@
 
 Enemy::Enemy(Point const& position, Point const& size, uint16_t hp, uint16_t sp,
              Texture const& texture)
-    : Entity(position, size, hp, sp, texture) {}
+    : Entity(position, hp, sp, texture) {}
 
 Enemy::Enemy(Enemy const& cpy) : Entity(cpy) {}
 

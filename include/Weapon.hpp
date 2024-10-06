@@ -26,7 +26,7 @@ class Projectile {
     Point const& get_direction() const;
     Point get_size() const;
     uint16_t get_speed() const;
-    std::string const& get_texture() const;
+    Texture get_texture() const;
 
     void set_direction(Point const& new_dir);
 

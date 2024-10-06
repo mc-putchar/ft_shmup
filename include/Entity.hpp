@@ -17,10 +17,10 @@
 class Weapon;
 
 struct Point {
-    uint16_t x;
-    uint16_t y;
+    int16_t x;
+    int16_t y;
     Point() : x(0), y(0) {};
-    Point(uint16_t x, uint16_t y) : x(x), y(y){};
+    Point(int16_t x, int16_t y) : x(x), y(y){};
     Point(Point const& cpy) : x(cpy.x), y(cpy.y){};
     Point& operator=(Point const& rhs) {
         if (this == &rhs)
@@ -61,7 +61,7 @@ struct Texture {
 
 class Entity {
   public:
-    Entity(Point const& position, Point const& size, uint16_t hp, uint16_t sp,
+    Entity(Point const& position, uint16_t hp, uint16_t sp,
            Texture const& texture);
     Entity(Entity const& cpy);
     Entity& operator=(Entity const& rhs);
@@ -76,13 +76,13 @@ class Entity {
     Point get_size() const;
     uint16_t get_health() const;
     uint16_t get_shield() const;
-    std::string const& get_texture() const;
+    Texture get_texture() const;
 
     void set_position(Point const& new_position);
     void set_direction(Point const& new_direction);
     void set_health(uint16_t hp);
     void set_shield(uint16_t sp);
-    void set_skin(Texture const& skin);
+    void set_texture(Texture const& skin);
     void set_weapon(Weapon* new_weapon);
 
   protected:

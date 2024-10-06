@@ -35,8 +35,8 @@ uint16_t Projectile::get_speed() const {
     return this->speed;
 }
 
-std::string const& Projectile::get_texture() const {
-	return this->texture.data;
+Texture Projectile::get_texture() const {
+	return this->texture;
 }
 
 void Projectile::set_direction(Point const& new_dir) {

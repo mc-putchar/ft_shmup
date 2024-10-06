@@ -13,11 +13,11 @@
 #include <iostream>
 
 Player::Player(Point start_pos, uint16_t hp, uint16_t sp, Texture texture)
-    : Entity(start_pos, hp, sp, texture, nullptr) {
+    : Entity(start_pos, hp, sp, texture) {
     this->set_position(start_pos);
     this->set_health(hp);
     this->set_shield(shield);
-    this->set_skin(texture);
+    this->set_texture(texture);
     this->width = texture.width;
     this->height = texture.height;
     this->weapon = nullptr;
@@ -29,7 +29,7 @@ Player::Player(Player const& cpy) : Entity(cpy) {
     this->set_position(cpy.get_position());
     this->set_health(cpy.get_health());
     this->set_shield(cpy.get_shield());
-    this->set_skin(cpy.get_skin());
+    this->set_texture(cpy.get_texture());
     this->width = cpy.width;
     this->height = cpy.height;
     // this->weapon = cpy.weapon ? new Weapon(*cpy.weapon) : nullptr;
@@ -41,7 +41,7 @@ Player& Player::operator=(Player const& rhs) {
     this->set_position(rhs.get_position());
     this->set_health(rhs.get_health());
     this->set_shield(rhs.get_shield());
-    this->set_skin(rhs.get_skin());
+    this->set_texture(rhs.get_texture());
     this->width = rhs.width;
     this->height = rhs.height;
     // this->weapon = rhs.weapon ? new Weapon(*rhs.weapon) : nullptr;

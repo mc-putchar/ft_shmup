@@ -20,7 +20,7 @@ class Player : public Entity {
     Player(Player const& cpy);
     Player& operator=(Player const& rhs);
     ~Player();
-    void move(WINDOW *win, Point const& direction);
+    void move(WINDOW *win, Point const& direction); // TODO: fix problem with diff definition of move function
     void attack(Entity& target);
     void take_damage(int amount);
 
