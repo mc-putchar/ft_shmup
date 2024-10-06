@@ -19,17 +19,12 @@ class Projectile;
 struct Point;
 struct Game;
 
-enum e_gamestatus {
-    STORY,
-    MENU,
-    PLAY,
-    GAMEOVER
-};
+enum e_gamestatus { STORY, MENU, PLAY, GAMEOVER };
 struct Region {
-    Region(int _id) : id(_id) {};
+    Region(int _id) : id(_id){};
 
     bool is_point_inside(Point const& p);
-    std::vector<Region> get_adjacent_regions(Game const& world) const;
+    // std::vector<Region> get_adjacent_regions(Game const& world) const;
 
     int16_t id;
     int16_t width;

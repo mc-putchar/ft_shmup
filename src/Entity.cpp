@@ -42,7 +42,7 @@ Entity& Entity::operator=(Entity const& rhs) {
     return *this;
 }
 
-void Entity::move(void) {
+void Entity::repos(void) {
     this->position += this->direction;
 }
 

@@ -83,31 +83,31 @@ void Player::move(Game const& world, Point const& direction) {
         return;
     }
     this->position += direction;
-    if (this->current_regions.size() > 0) {
-        this->current_regions.clear();
-        for (Region& r : this->current_regions) {
-            if (!r.is_point_inside(this->position)) {
-                for (Region adj : r.get_adjacent_regions(world)) {
-                    if (adj.is_point_inside(this->position)) {
-                        this->current_regions.push_back(adj);
-                    } else if (adj.is_point_inside(
-                                   this->position +
-                                   Point(0, this->texture.height))) {
-                        this->current_regions.push_back(adj);
-                    } else if (adj.is_point_inside(
-                                   this->position +
-                                   Point(this->texture.width, 0))) {
-                        this->current_regions.push_back(adj);
-                    } else if (adj.is_point_inside(
-                                   this->position +
-                                   Point(this->texture.width,
-                                         this->texture.height))) {
-                        this->current_regions.push_back(adj);
-                    }
-                }
-            }
-        }
-    }
+    // if (this->current_regions.size() > 0) {
+    //     this->current_regions.clear();
+    //     for (Region& r : this->current_regions) {
+    //         if (!r.is_point_inside(this->position)) {
+    //             for (Region adj : r.get_adjacent_regions(world)) {
+    //                 if (adj.is_point_inside(this->position)) {
+    //                     this->current_regions.push_back(adj);
+    //                 } else if (adj.is_point_inside(
+    //                                this->position +
+    //                                Point(0, this->texture.height))) {
+    //                     this->current_regions.push_back(adj);
+    //                 } else if (adj.is_point_inside(
+    //                                this->position +
+    //                                Point(this->texture.width, 0))) {
+    //                     this->current_regions.push_back(adj);
+    //                 } else if (adj.is_point_inside(
+    //                                this->position +
+    //                                Point(this->texture.width,
+    //                                      this->texture.height))) {
+    //                     this->current_regions.push_back(adj);
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
     this->_display(world.main);
 }
 

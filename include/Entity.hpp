@@ -87,7 +87,7 @@ class Entity {
     Entity& operator=(Entity const& rhs);
     virtual ~Entity() = default;
 
-    virtual void move(void);
+    virtual void repos(void);
     virtual void take_damage(int amount);
     virtual void attack(Entity& target);
 

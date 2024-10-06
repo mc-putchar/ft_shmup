@@ -15,12 +15,12 @@
 
 Projectile::Projectile(Texture const& tex, Point const& pos, Point const& dir,
                        int16_t damage, uint16_t speed)
-    : texture(tex),
+    : active(true),
+      texture(tex),
       position(pos),
       direction(dir),
       damage(damage),
-      speed(speed),
-      active(true) {}
+      speed(speed) {}
 
 Projectile::~Projectile() {}
 
@@ -114,6 +114,5 @@ Projectile* Weapon::shoot(Point const& dir, Point const& start, uint32_t time) {
     //     return nullptr;
     this->last_shot = time;
     return new Projectile(this->projectile_texture, start, dir,
-                this->projectile_damage,
-                this->projectile_speed);
+                          this->projectile_damage, this->projectile_speed);
 }

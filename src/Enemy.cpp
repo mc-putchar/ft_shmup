@@ -45,7 +45,7 @@ void Enemy::update(std::vector<Projectile*>& bullets, int frame) {
     if (++this->ticks < 10)
         return;
     this->ticks = 0;
-    this->Entity::move();
+    this->Entity::repos();
     if (this->weapon) {
         Projectile* p =
             this->weapon->shoot(Point(-1, 0), this->position, frame);

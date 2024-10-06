@@ -64,7 +64,7 @@ char get_wall_piece(int n) {
     static char const* wall_segs = ".,/_\\`-;:";
     return wall_segs[n % 10];
 }
-static int initialize_world(Game& world);
+// static int initialize_world(Game& world);
 
 int main(int ac, char** av) {
     if (ac > 1)
@@ -83,7 +83,7 @@ int main(int ac, char** av) {
     // mvwprintw(stdscr, 0, 1, "ft_shmup");
     refresh();
     if (world.status == STORY) {
-        // display_story(config, LINES, COLS);
+        display_story(config, LINES, COLS);
         world.status = MENU;
     }
     init_windows(world);
@@ -187,22 +187,22 @@ static void game_loop(Game& world, Player& p) {
     }
 }
 
-static int initialize_world(Game& world) {
-    uint16_t mw, mh;
-    uint16_t rg_height, rg_width;
-    getmaxyx(world.main, mh, mw);
-    rg_height = mh / 4;
-    rg_width = mw / 4;
-    // for (int i = 0; i < 16; ++i) {
-    //     Region curr = Region(i);
-    //     curr.width = rg_width;
-    //     curr.height = rg_height;
-    //     curr.origin_x = rg_width * (i % 4);
-    //     curr.origin_y = rg_height * (i % 4);
-    //     world.regions.push_back(curr);
-    // }
-    return (0);
-}
+// static int initialize_world(Game& world) {
+//     uint16_t mw, mh;
+//     uint16_t rg_height, rg_width;
+//     getmaxyx(world.main, mh, mw);
+//     rg_height = mh / 4;
+//     rg_width = mw / 4;
+//     // for (int i = 0; i < 16; ++i) {
+//     //     Region curr = Region(i);
+//     //     curr.width = rg_width;
+//     //     curr.height = rg_height;
+//     //     curr.origin_x = rg_width * (i % 4);
+//     //     curr.origin_y = rg_height * (i % 4);
+//     //     world.regions.push_back(curr);
+//     // }
+//     return (0);
+// }
 
 static int check_for_collision(Game& world, Entity const& e) {
     auto check_collision = [](Point const& p1, Point const& size1,
