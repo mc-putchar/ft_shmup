@@ -12,8 +12,7 @@
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
-#include <mutex>
-#include <thread>
+#include <random>
 #include <vector>
 
 #include "Enemy.hpp"
@@ -24,10 +23,12 @@
 #include "Weapon.hpp"
 #include "ft_shmup.hpp"
 
-pthread_mutex_t key_pressed_mtx = PTHREAD_MUTEX_INITIALIZER;
+int64_t g_score = 0;
 
 static void game_loop(Game& world, Player& p);
 static int check_for_collision(Game& world, Entity const& e);
+static void display_hud(Game& world, Player& p);
+static void draw_background(Game const& world);
 
 void display_story(GameConfig& config, int rows, int cols) {
     (void)cols;
@@ -59,12 +60,6 @@ typedef struct {
     std::chrono::duration<double> elapsedTime;
     std::chrono::duration<double> remainingTime;
 } GameParams;
-
-char get_wall_piece(int n) {
-    static char const* wall_segs = ".,/_\\`-;:";
-    return wall_segs[n % 10];
-}
-// static int initialize_world(Game& world);
 
 int main(int ac, char** av) {
     if (ac > 1)
@@ -113,18 +108,36 @@ static void game_loop(Game& world, Player& p) {
     Enemy::create_enemies(world.enemies, 210);
     world.status = PLAY;
     while (true) {
+        if (g_score == 300) {
+            mvwprintw(world.main, 1, 1, "YOU WIN");
+            wrefresh(world.main);
+            usleep(1000000);
+            cleanup_and_exit();
+        }
+        if (i % 123) {
+            draw_background(world);
+            refresh();
+            wrefresh(world.main);
+        }
+        init_pair(3, COLOR_RED, COLOR_BLACK);  // Define gray color pair
         for (std::vector<Enemy>::iterator it = world.enemies.begin();
              it != world.enemies.end(); ++it) {
             Enemy* enemy = dynamic_cast<Enemy*>(&(*it));
             if (enemy) {
                 enemy->update(world.bullets, i);
+                wattron(world.main,
+                        COLOR_PAIR(3));  // Assuming color pair 2 is red
                 put_entity(world.main, *enemy);
+                wattroff(world.main, COLOR_PAIR(3));
             }
         }
+        init_pair(4, COLOR_WHITE, COLOR_MAGENTA);  // Define gray color pair
         for (std::vector<Projectile*>::iterator it = world.bullets.begin();
              it != world.bullets.end(); ++it) {
             (*it)->update();
+            wattron(world.main, COLOR_PAIR(4));
             put_projectile(world.main, *it);
+            wattroff(world.main, COLOR_PAIR(4));
         }
         for (auto bullet : world.bullets) {
             if (!bullet->active) {
@@ -172,7 +185,7 @@ static void game_loop(Game& world, Player& p) {
             default:
                 p.move(world, Point(0, 0));
                 wborder(world.main, 0, 0, 0, 0, 0, 0, 0, 0);
-                wborder(world.hud, 0, 0, 0, 0, 0, 0, 0, 0);
+                display_hud(world, p);
                 break;
         }
         // }
@@ -182,6 +195,33 @@ static void game_loop(Game& world, Player& p) {
         usleep(10000);  // Sleep for 20ms
         i++;
         if (check_for_collision(world, p) == 1) {
+            p.set_health(p.get_health() - 1);
+            if (p.get_health() == 0) {
+                mvwprintw(world.main, 1, 1, "GAME OVER");
+                wrefresh(world.main);
+                usleep(1000000);
+                cleanup_and_exit();
+            }
+        }
+    }
+}
+
+// static int initialize_world(Game& world) {
+//     uint16_t mw, mh;
+//     uint16_t rg_height, rg_width;
+//     getmaxyx(world.main, mh, mw);
+//     rg_height = mh / 4;
+//     rg_width = mw / 4;
+//     // for (int i = 0; i < 16; ++i) {
+//     //     Region curr = Region(i);
+//     //     curr.width = rg_width;
+//     //     curr.height = rg_height;
+//     //     curr.origin_x = rg_width * (i % 4);
+//     //     curr.origin_y = rg_height * (i % 4);
+//     //     world.regions.push_back(curr);
+//     // }
+//     return (0);
+// }
             for (auto bullet : world.bullets)
                 delete bullet;
             world.bullets.clear();
@@ -205,6 +245,9 @@ static int check_for_collision(Game& world, Entity const& e) {
     for (Enemy const& enemy : world.enemies) {
         if (check_collision(e.get_position(), e.get_size(),
                             enemy.get_position(), enemy.get_size())) {
+            world.enemies.erase(
+                std::remove(world.enemies.begin(), world.enemies.end(), enemy),
+                world.enemies.end());
             return 1;
         }
     }
@@ -212,6 +255,9 @@ static int check_for_collision(Game& world, Entity const& e) {
     for (Projectile* bullet : world.bullets) {
         if (check_collision(e.get_position(), e.get_size(),
                             bullet->get_position(), bullet->get_size())) {
+            world.bullets.erase(
+                std::remove(world.bullets.begin(), world.bullets.end(), bullet),
+                world.bullets.end());
             return 1;
         }
     }
@@ -226,11 +272,47 @@ static int check_for_collision(Game& world, Entity const& e) {
                 world.bullets.erase(std::remove(world.bullets.begin(),
                                                 world.bullets.end(), bullet),
                                     world.bullets.end());
+                g_score += 10;
             }
         }
     }
 
     return (0);
+}
+
+static void display_hud(Game& world, Player& p) {
+    mvwprintw(world.hud, 1, 1, "Health: %d", p.get_health());
+    mvwprintw(world.hud, 3, 1, "Score: %ld", g_score);
+    mvwprintw(world.hud, 5, 1, "FPS: 60");
+    wborder(world.hud, 0, 0, 0, 0, 0, 0, 0, 0);
+    wrefresh(world.hud);
+}
+
+static char get_background_element(void) {
+    int chance = rand() % 10000;
+    if (chance == 1) {
+        return '@';
+    } else if (chance < 10) {
+        return chance % 2 ? '*' : '+';
+    } else if (chance < 20) {
+        return chance % 2 ? ',' : '`';
+    } else {
+        return ' ';
+    }
+}
+
+static void draw_background(Game const& world) {
+    int16_t mw, mh;
+    getmaxyx(world.main, mh, mw);
+    start_color();
+    init_pair(1, COLOR_YELLOW, COLOR_BLACK);  // Define gray color pair
+    for (int i = 0; i < mh; ++i) {
+        for (int j = 0; j < mw; ++j) {
+            wattron(world.main, COLOR_PAIR(1));
+            mvwaddch(world.main, i, j, get_background_element());
+            wattroff(world.main, COLOR_PAIR(1));
+        }
+    }
 }
 
 int cleanup_and_exit(void) {

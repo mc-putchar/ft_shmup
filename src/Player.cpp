@@ -115,10 +115,13 @@ void Player::move(Game const& world, Point const& direction) {
 
 void Player::_display(WINDOW* win) const {
     uint16_t cursor = 0;
+    init_pair(2, COLOR_GREEN, COLOR_BLACK);  // Define gray color pair
+    wattron(win, COLOR_PAIR(2)); // Assuming color pair 1 is green
     for (uint16_t row = 0; row < this->texture.height; ++row) {
         mvwprintw(
             win, this->position.y + row, this->position.x, "%s",
             this->texture.data.substr(cursor, this->texture.width).c_str());
         cursor += this->texture.width;
     }
+    wattroff(win, COLOR_PAIR(1));
 }
