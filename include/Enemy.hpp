@@ -30,6 +30,10 @@ class Enemy : public Entity {
     virtual void update(std::vector<Projectile*>& bullets, int frame);
     virtual void die();
     static void create_enemies(std::vector<Enemy>& enemies, int n);
+    bool operator==(const Enemy& other) const {
+        // Compare relevant members for equality
+        return this == &other;  // Example comparison
+    }
 
   protected:
     e_state state;
