@@ -41,15 +41,23 @@ struct Point {
         this->y -= p.y;
         return *this;
     };
-    Point& operator+(Point const& p) {
-        this->x += p.x;
-        this->y += p.y;
-        return *this;
+    bool operator==(Point const& p) const {
+        return this->x == p.x && this->y == p.y;
     };
-    Point& operator-(Point const& p) {
-        this->x -= p.x;
-        this->y -= p.y;
-        return *this;
+    bool operator!=(Point const& p) const {
+        return this->x != p.x || this->y != p.y;
+    };
+    bool operator>=(Point const& p) const {
+        return this->x >= p.x && this->y >= p.y;
+    };
+    bool operator<=(Point const& p) const {
+        return this->x <= p.x && this->y <= p.y;
+    };
+    Point operator+(Point const& p) const {
+        return Point(this->x + p.x, this->y + p.y);
+    };
+    Point operator-(Point const& p) const {
+        return Point(this->x - p.x, this->y - p.y);
     };
 };
 

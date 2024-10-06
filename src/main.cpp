@@ -27,6 +27,7 @@
 pthread_mutex_t key_pressed_mtx = PTHREAD_MUTEX_INITIALIZER;
 
 static void game_loop(Game& world, Player& p);
+static int check_for_collision(Game const& world, Entity const& e);
 
 void display_story(GameConfig& config, int rows, int cols) {
     (void)cols;
@@ -87,16 +88,16 @@ int main(int ac, char** av) {
         world.status = MENU;
     }
     nodelay(stdscr, TRUE);  // non-blocking getch
-    initialize_world(world);
+    // initialize_world(world);
 
     Texture skin(10, 3, "~>L-\\___  ~XE[]==O}>~>F-/```  ");
     Player p(Point(1, 15), 10, 10, skin);
-    p.current_regions.clear();  // Clear current regions before updating
-    for (Region r : world.regions) {
-        if (true || r.is_point_inside(p.get_position())) {
-            p.current_regions.push_back(r);
-        }
-    }
+    // p.current_regions.clear();  // Clear current regions before updating
+    // for (Region r : world.regions) {
+    //     if (true || r.is_point_inside(p.get_position())) {
+    //         p.current_regions.push_back(r);
+    //     }
+    // }
     // refresh();
     // wrefresh(world.main);
     // (void)wgetch(world.main);
@@ -112,17 +113,18 @@ static void game_loop(Game& world, Player& p) {
     nodelay(stdscr, TRUE);      // Make wgetch non-blocking
     int ch;
     int i = 0;
-    std::vector<Enemy> enemies;
-    Enemy::create_enemies(enemies, 5);
-    std::vector<Projectile> bullets;
+    Enemy::create_enemies(world.enemies, 5);
     while (true) {
-        for (std::vector<Enemy>::iterator it = enemies.begin();
-             it != enemies.end(); ++it) {
-            it->update(bullets);
-            put_entity(world.main, *it);
+        for (std::vector<Enemy>::iterator it = world.enemies.begin();
+             it != world.enemies.end(); ++it) {
+            Enemy* enemy = dynamic_cast<Enemy*>(&(*it));
+            if (enemy) {
+                enemy->update(world.bullets);
+                put_entity(world.main, *enemy);
+            }
         }
-        for (std::vector<Projectile>::iterator it = bullets.begin();
-             it != bullets.end(); ++it) {
+        for (std::vector<Projectile>::iterator it = world.bullets.begin();
+             it != world.bullets.end(); ++it) {
             it->update();
             put_projectile(world.main, *it);
         }
@@ -166,30 +168,17 @@ static void game_loop(Game& world, Player& p) {
                 break;
         }
         // }
-        if (p.current_regions.empty()) {
-            mvwprintw(world.hud, 1, 1, "Player is not in any region");
-        } else {
-            std::string regions_str = "Player regions: ";
-            for (Region region : p.current_regions) {
-                regions_str += std::to_string(region.id) + " ";
-            }
-            mvwprintw(world.hud, 1, 1, regions_str.c_str());
-        }
-        int row = 1;  // Start displaying regions from the second row
-        for (const Region& region : world.regions) {
-            mvwprintw(world.hud, row++, 40, "Region %d: (%d, %d) - (%d, %d)",
-                      region.id, region.origin_x, region.origin_y,
-                      region.origin_x + region.width,
-                      region.origin_y + region.height);
-            if (row >= 7) {
-                break;
-            }
-        }
         refresh();
         wrefresh(world.main);
         wrefresh(world.hud);
         usleep(10000);  // Sleep for 20ms
         i++;
+        if (check_for_collision(world, p) == 1) {
+            mvwprintw(world.main, 10, 40, "GAME OVER");
+            wrefresh(world.main);
+            usleep(1000000);
+            cleanup_and_exit();
+        }
     }
 }
 
@@ -199,13 +188,36 @@ static int initialize_world(Game& world) {
     getmaxyx(world.main, mh, mw);
     rg_height = mh / 4;
     rg_width = mw / 4;
-    for (int i = 0; i < 16; ++i) {
-        Region curr = Region(i);
-        curr.width = rg_width;
-        curr.height = rg_height;
-        curr.origin_x = rg_width * (i % 4);
-        curr.origin_y = rg_height * (i % 4);
-        world.regions.push_back(curr);
+    // for (int i = 0; i < 16; ++i) {
+    //     Region curr = Region(i);
+    //     curr.width = rg_width;
+    //     curr.height = rg_height;
+    //     curr.origin_x = rg_width * (i % 4);
+    //     curr.origin_y = rg_height * (i % 4);
+    //     world.regions.push_back(curr);
+    // }
+    return (0);
+}
+
+static int check_for_collision(Game const& world, Entity const& e) {
+    auto check_collision = [](Point const& p1, Point const& size1,
+                              Point const& p2, Point const& size2) {
+        return (p1.x < p2.x + size2.x && p1.x + size1.x > p2.x &&
+                p1.y < p2.y + size2.y && p1.y + size1.y > p2.y);
+    };
+
+    for (Enemy const& enemy : world.enemies) {
+        if (check_collision(e.get_position(), e.get_size(),
+                            enemy.get_position(), enemy.get_size())) {
+            return 1;
+        }
+    }
+
+    for (Projectile const& bullet : world.bullets) {
+        if (check_collision(e.get_position(), e.get_size(),
+                            bullet.get_position(), bullet.get_size())) {
+            return 1;
+        }
     }
     return (0);
 }
