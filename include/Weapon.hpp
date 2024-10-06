@@ -31,6 +31,10 @@ class Projectile {
     void set_direction(Point const& new_dir);
 
     void update();
+    bool operator==(const Projectile& other) const {
+        // Compare relevant members for equality
+        return this == &other;  // Example comparison
+    }
 
   private:
     Texture texture;

@@ -27,7 +27,7 @@
 pthread_mutex_t key_pressed_mtx = PTHREAD_MUTEX_INITIALIZER;
 
 static void game_loop(Game& world, Player& p);
-static int check_for_collision(Game const& world, Entity const& e);
+static int check_for_collision(Game& world, Entity const& e);
 
 void display_story(GameConfig& config, int rows, int cols) {
     (void)cols;
@@ -95,7 +95,7 @@ int main(int ac, char** av) {
     Player p(Point(1, 15), 10, 10, skin);
     Texture bullet_tex(1, 1, "-");
     Texture laser_icon(3, 3, ",_,|!|```");
-    Weapon *laser = new Weapon(laser_icon, 1000, 1, bullet_tex, 3);
+    Weapon* laser = new Weapon(laser_icon, 1000, 1, bullet_tex, 3);
     p.set_weapon(laser);
 
     game_loop(world, p);
@@ -196,7 +196,7 @@ static int initialize_world(Game& world) {
     return (0);
 }
 
-static int check_for_collision(Game const& world, Entity const& e) {
+static int check_for_collision(Game& world, Entity const& e) {
     auto check_collision = [](Point const& p1, Point const& size1,
                               Point const& p2, Point const& size2) {
         return (p1.x < p2.x + size2.x && p1.x + size1.x > p2.x &&
@@ -216,6 +216,21 @@ static int check_for_collision(Game const& world, Entity const& e) {
             return 1;
         }
     }
+
+    for (Enemy& enemy : world.enemies) {
+        for (Projectile* bullet : world.bullets) {
+            if (check_collision(enemy.get_position(), enemy.get_size(),
+                                bullet->get_position(), bullet->get_size())) {
+                world.enemies.erase(std::remove(world.enemies.begin(),
+                                                world.enemies.end(), enemy),
+                                    world.enemies.end());
+                world.bullets.erase(std::remove(world.bullets.begin(),
+                                                world.bullets.end(), bullet),
+                                    world.bullets.end());
+            }
+        }
+    }
+
     return (0);
 }
 
