@@ -194,7 +194,7 @@ static void game_loop(Game& world, Player& p) {
         refresh();
         wrefresh(world.main);
         wrefresh(world.hud);
-        usleep(10000);  // Sleep for 20ms
+        usleep(20000);  // Sleep for 40ms
         i++;
         if (check_for_collision(world, p) == 1) {
             p.set_health(p.get_health() - 1);

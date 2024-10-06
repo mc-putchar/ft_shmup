@@ -71,3 +71,30 @@
 		}
 	],
 }
+
+#  /--\,<~
+# G[II]XK~
+#  \--/`<~
+{
+	"class": "intern",
+	"size": "small",
+	"hullpoints": 4,
+	"speed": 5,
+	"agility": 5,
+	"num_states": 3,
+	"states": [
+		{
+			"name": "off",
+			"width": 8,
+			"height": 3,
+			"hull": " <II>,< G[II]XK  <II>`< "
+		},
+		{
+			"name": "idle",
+			"width": 8,
+			"height": 3,
+			"hull": "/--\,<~G[II]XK~ \--/`<~"
+		},
+	],
+}
+ /--\,<~G[II]XK~ \--/`<~
