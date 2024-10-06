@@ -13,7 +13,7 @@ CXX := c++
 CXXFLAGS := -Wall -Wextra 
 # CXXFLAGS := -Werror -std=c++11
 CPPFLAGS := -I$(INCDIR)
-LDFLAGS := -lncurses
+LDFLAGS := -lncursesw
 
 .PHONY: all, clean, fclean, re
 

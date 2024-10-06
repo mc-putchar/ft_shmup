@@ -8,12 +8,18 @@
 #include <fstream>
 #include <iostream>
 #include <thread>
+#include <cwchar>
 #include "GameConfig.hpp"
 
 void display_story(GameConfig& config, int rows, int cols) {
 	(void)cols;
     std::string line;
     int i = 0;
+	// wchar_t *str = L"Hello, world! こんにちは世界！";
+	// 任意のボタンを押してください
+    // Print the wide character string
+    // mvwaddwstr(stdscr, 5, 5, str);
+	// refresh();
     if ((int)config.intro.size() == 0) {
         mvprintw(0, 0, "...loading story...");
     }
@@ -25,7 +31,7 @@ void display_story(GameConfig& config, int rows, int cols) {
             mvprintw(i + 1, 15, "%s", line.c_str());
             i++;
             refresh();
-            usleep(50000);
+            usleep(10000);
         }
     }
 }
@@ -34,8 +40,15 @@ void init_game() {
     (void)initscr();
     (void)cbreak();
     (void)noecho();
+	setlocale(LC_ALL, "");
     start_color();                          // allow colors
     init_pair(1, COLOR_CYAN, COLOR_BLACK);  // color pair 1
+	init_pair(2, COLOR_RED, COLOR_BLACK);   // color pair 2
+	init_pair(3, COLOR_GREEN, COLOR_BLACK); // color pair 3
+	init_pair(4, COLOR_YELLOW, COLOR_BLACK);// color pair 4
+	init_pair(5, COLOR_BLUE, COLOR_BLACK);  // color pair 5
+	init_pair(6, COLOR_MAGENTA, COLOR_BLACK);// color pair 6
+	init_pair(7, COLOR_WHITE, COLOR_BLACK); // color pair 7
     keypad(stdscr, TRUE);                   // enable function and cursor keys
     (void)nonl();  // do not add newline when pressing enter
     cbreak();      // do not buffer input
@@ -47,9 +60,41 @@ typedef struct {
 	double fps;
 	std::chrono::time_point<std::chrono::high_resolution_clock> startTime;
     std::chrono::time_point<std::chrono::high_resolution_clock> endTime;
-	std::chrono::duration<double> elapsedTime;
+	std::chrono::duration<double> elapsedTime;	
 	std::chrono::duration<double> remainingTime;
 }	GameParams;
+
+
+// typedef enum {
+// 	BLOCK = 0,
+// 	EMPTY,
+// }	BlockType;
+
+void fillBackground(WINDOW *my_pad)
+{
+	const wchar_t *blocks[] = {L"█", L"▓", L"▒", L"░"};
+	int numBlocks = sizeof(blocks) / sizeof(blocks[0]);
+
+	for (int y = 1; y < LINES; ++y) {
+        for (int x = 0; x < COLS * 2; ++x) {
+			const wchar_t *bl = blocks[rand() % numBlocks];
+			int colorPair = 1 + rand() % 3;
+			// uint8_t ch = rand() % 128;
+		
+			wattrset(my_pad, COLOR_PAIR(colorPair));
+            mvwaddwstr(my_pad, y, x, blocks[0]); 
+			wattroff(my_pad, COLOR_PAIR(colorPair));
+        }
+    }
+	// for (int y = 0; y < LINES; ++y) {
+    //     for (int x = 0; x < COLS * 2; ++x) {
+	// 		uint8_t ch = rand() % 128;
+    //         mvwaddch(my_pad, y, x, ch); // 
+    //     }
+    // }
+
+
+} 
 
 int main(int ac, char** av) {
     if (ac > 1)
@@ -67,23 +112,25 @@ int main(int ac, char** av) {
     params.startTime = std::chrono::high_resolution_clock::now();
     // auto lastTime = startTime;
     int c = 0;
-	WINDOW* my_pad = newpad(LINES, 300);	
-	for (int y = 0; y < LINES; ++y) {
-        for (int x = 0; x < COLS * 2; ++x) {
-			uint8_t ch = rand() % 128;
-            mvwaddch(my_pad, y, x, ch); // 
-        }
+	WINDOW* my_pad = newpad(LINES, 300);
+	
+	if (my_pad == nullptr) {
+        endwin();
+        fprintf(stderr, "Error creating pad\n");
+        return 1;
     }
+
+	fillBackground(my_pad); 
 
 	int offset = 0;
     while ((c = getch()) != 27) {
         if (!config.storyPlayed) {
 			nodelay(stdscr, FALSE); 
             display_story(config, LINES, COLS);
-			mvwprintw(stdscr, 0, LINES - 10, "%s", "hello");
             if ((c) != 27 && (c) != ERR) {
                 config.storyPlayed = true;
 				nodelay(stdscr, TRUE); 
+				werase(stdscr);
                 continue;
             } else if ((c) != ERR) {
 				break;
@@ -96,9 +143,10 @@ int main(int ac, char** av) {
             // werase(stdscr);
             // pnoutrefresh(my_pad, 0, offset, 0, 0, LINES - 1, COLS - 1);
 
-			usleep(50000);
+			usleep(200000);
 
-			prefresh(my_pad, 0, offset, 0, 0, LINES - 1, COLS - 1);
+			prefresh(my_pad, 0, offset, 0, 0, 9, COLS - 1);
+			prefresh(my_pad, LINES - 10, offset, LINES - 10, 0, LINES - 1, COLS - 1);
 
 			char fpsStr[10];
             snprintf(fpsStr, sizeof(fpsStr), "fps %.2f", params.fps);
@@ -124,6 +172,7 @@ int main(int ac, char** av) {
             }
         }
     }
+	delwin(my_pad);
     endwin();
     return (0);
 }
