@@ -1,0 +1,8 @@
+[window]
+startup_mode = "maximized"
+
+[env]
+TERM = "xterm-256color"
+
+[font]
+size = 16.0

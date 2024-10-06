@@ -23,6 +23,7 @@ Opening:
 1. Story (scrolling up-left)
 2. Menu {
 		New Game [solo, split?, online?],
+		a ascii based character/entity.
 		Guide [basic controls],
 		High Scores [top 10 player scores],
 		Settings [graphics, keybinds], => .conf file

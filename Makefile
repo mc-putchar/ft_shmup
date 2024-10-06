@@ -5,12 +5,13 @@ SRCDIR := src
 INCDIR := include
 BINDIR := build
 
-SRCS := main
+SRCS := main draw Entity Enemy Weapon GameConfig
 
 BINS := $(SRCS:%=$(BINDIR)/%.o)
 
 CXX := c++
-CXXFLAGS := -Wall -Wextra -std=c++11
+CXXFLAGS := -Wall -Wextra 
+# CXXFLAGS := -Werror -std=c++11
 CPPFLAGS := -I$(INCDIR)
 LDFLAGS := -lncurses
 
@@ -26,6 +27,9 @@ $(BINDIR)/%.o: $(SRCDIR)/%.cpp | $(BINDIR)
 
 $(BINDIR):
 	mkdir -p $(BINDIR)
+
+run: all
+	@PATH=".$${PATH:+:$${PATH}}" && alacritty --config-file alacritty_config.toml --command $(NAME)
 
 clean:
 	rm -fr $(BINDIR)
