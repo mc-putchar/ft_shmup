@@ -10,10 +10,11 @@
 
 #pragma once
 
-#include "Entity.hpp"
-#include "Weapon.hpp"
-#include <cstdint>
 #include <curses.h>
+#include <cstdint>
+#include "Entity.hpp"
+#include "Game.hpp"
+#include "Weapon.hpp"
 
 class Player : public Entity {
   public:
@@ -21,11 +22,14 @@ class Player : public Entity {
     Player(Player const& cpy);
     Player& operator=(Player const& rhs);
     ~Player();
-    void move(WINDOW *win, Point const& direction); // TODO: fix problem with diff definition of move function
+    void move(
+        Game const& world,
+        Point const&
+            direction);  // TODO: fix problem with diff definition of move function
     void attack(Entity& target);
     void fire(void);
     void take_damage(int amount);
 
   private:
-    void _display(WINDOW *win) const;
+    void _display(WINDOW* win) const;
 };

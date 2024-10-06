@@ -5,13 +5,12 @@ SRCDIR := src
 INCDIR := include
 BINDIR := build
 
-SRCS := main draw Entity Enemy Weapon GameConfig Player
+SRCS := main draw Entity Enemy Weapon GameConfig Player Game
 
 BINS := $(SRCS:%=$(BINDIR)/%.o)
 
 CXX := c++
-CXXFLAGS := -Wall -Wextra 
-# CXXFLAGS := -Werror -std=c++11
+CXXFLAGS := -Wall -Wextra -std=c++11 -ggdb3
 CPPFLAGS := -I$(INCDIR)
 LDFLAGS := -lncurses
 

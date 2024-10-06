@@ -10,9 +10,11 @@
 
 #pragma once
 
+#include <curses.h>
 #include <cstdint>
 #include <string>
-#include <curses.h>
+#include <vector>
+#include "Game.hpp"
 
 class Weapon;
 
@@ -20,8 +22,8 @@ struct Point {
     int16_t x;
     int16_t y;
     Point() : x(0), y(0) {};
-    Point(int16_t x, int16_t y) : x(x), y(y){};
-    Point(Point const& cpy) : x(cpy.x), y(cpy.y){};
+    Point(int16_t x, int16_t y) : x(x), y(y) {};
+    Point(Point const& cpy) : x(cpy.x), y(cpy.y) {};
     Point& operator=(Point const& rhs) {
         if (this == &rhs)
             return *this;
@@ -39,13 +41,23 @@ struct Point {
         this->y -= p.y;
         return *this;
     };
+    Point& operator+(Point const& p) {
+        this->x += p.x;
+        this->y += p.y;
+        return *this;
+    };
+    Point& operator-(Point const& p) {
+        this->x -= p.x;
+        this->y -= p.y;
+        return *this;
+    };
 };
 
 struct Texture {
     Texture(uint16_t w, uint16_t h, std::string const& data)
-        : width(w), height(h), data(data){};
+        : width(w), height(h), data(data) {};
     Texture(Texture const& cpy)
-        : width(cpy.width), height(cpy.height), data(cpy.data){};
+        : width(cpy.width), height(cpy.height), data(cpy.data) {};
     Texture& operator=(Texture const& rhs) {
         if (this == &rhs)
             return *this;
@@ -84,6 +96,8 @@ class Entity {
     void set_shield(uint16_t sp);
     void set_texture(Texture const& skin);
     void set_weapon(Weapon* new_weapon);
+
+    std::vector<Region> current_regions;
 
   protected:
     Point position;
