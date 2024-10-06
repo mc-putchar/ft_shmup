@@ -77,8 +77,6 @@ int main(int ac, char** av) {
     Game game;
     init_screen(game);
 
-    nodelay(stdscr, TRUE);  // non-blocking getch
-
     params.fps = 60.0;
     params.startTime = std::chrono::high_resolution_clock::now();
     // auto lastTime = startTime;
@@ -99,7 +97,7 @@ int main(int ac, char** av) {
 
     Texture skin(10, 3, "~>L-\\___  ~XE[]==O}>~>F-/```  ");
     Player p(Point(20, 20), 10, 10, skin);
-    p.move(stdscr, Point(0, 0));  // Draw player at start position
+    // p.move(stdscr, Point(0, 0));  // Draw player at start position
 
     std::vector<Enemy> enemies;
     Enemy::create_enemies(enemies, 5);
@@ -139,12 +137,15 @@ int main(int ac, char** av) {
                     // mvwprintw(stdscr, 10, 40, "KEY_RIGHT");
                     p.move(my_pad, Point(1, 0));
                     break;
+                default:
+                    p.move(my_pad, Point(0, 0));
+                    break;
             }
             // werase(stdscr);
             // pnoutrefresh(my_pad, 0, offset, 0, 0, LINES - 1, COLS - 1);
 
             usleep(50000);
-            p.move(my_pad, Point(offset, 0));
+            // p.move(my_pad, Point(offset, 0));
             prefresh(my_pad, 0, offset, 0, 0, LINES - 1, COLS - 1);
 
             char fpsStr[10];
@@ -174,7 +175,7 @@ int main(int ac, char** av) {
             for (std::vector<Enemy>::iterator it = enemies.begin();
                  it != enemies.end(); ++it) {
                 it->update();
-                put_entity(stdscr, *it);
+                put_entity(my_pad, *it);
             }
         }
     }

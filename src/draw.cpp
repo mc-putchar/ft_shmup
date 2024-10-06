@@ -11,6 +11,7 @@ void init_screen(Game& game) {
     initscr();
     raw();
     keypad(stdscr, TRUE);
+    nodelay(stdscr, TRUE);  // non-blocking getch
     curs_set(0);
     nonl();
     cbreak();

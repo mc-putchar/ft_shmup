@@ -34,6 +34,7 @@ class Enemy : public Entity {
 
   protected:
     e_state state;
+    int ticks;
 
   private:
 };

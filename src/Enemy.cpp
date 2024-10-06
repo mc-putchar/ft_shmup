@@ -15,7 +15,7 @@
 
 Enemy::Enemy(Point const& position, uint16_t hp, uint16_t sp,
              Texture const& texture)
-    : Entity(position, hp, sp, texture), state(SPAWNING) {    }
+    : Entity(position, hp, sp, texture), state(SPAWNING), ticks(0) {}
 
 Enemy::Enemy(Enemy const& cpy) : Entity(cpy), state(cpy.state) {}
 
@@ -50,11 +50,13 @@ void Enemy::fire() {
 void Enemy::update(void) {
     // Point next_dir(3, 2);
     // this->set_direction(next_dir);
+    if (++this->ticks < 5) return;
+    this->ticks = 0;
     this->Entity::move();
     if (this->weapon) {
         for (std::vector<Projectile>::iterator it =
-                this->weapon->projectiles.begin();
-            it != this->weapon->projectiles.end(); ++it) {
+                 this->weapon->projectiles.begin();
+             it != this->weapon->projectiles.end(); ++it) {
             it->update();
         }
     }
@@ -72,8 +74,8 @@ void Enemy::create_enemies(std::vector<Enemy>& enemies, int n) {
     Texture bullet_tex(1, 1, "-");
     Texture laser_icon(3, 3, ",_,|!|```");
     Weapon laser(laser_icon, 1000, 1, bullet_tex);
-    Texture pisciner_tex(6, 1, " (0){~");
-    Texture peer_tex(4, 3, " -\ <=B~ -/ ");
+    Texture pisciner_tex(7, 1, " (0){~ ");
+    Texture peer_tex(5, 3, " -\\  <=B~  -/  ");
     int16_t x(180);
     Point dir(-1, 0);
     for (int i = 0; i < n; ++i) {
