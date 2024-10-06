@@ -53,9 +53,12 @@ Player::~Player() {
         delete this->weapon;
 }
 
-void Player::fire(void) {
+void Player::fire(std::vector<Projectile*>& bullets, int frame) {
     if (this->weapon) {
-        (void)this->weapon->shoot(Point(1, 0), this->position, 0);
+        Projectile* bullet =
+            this->weapon->shoot(Point(1, 0), this->position, frame);
+        if (bullet)
+            bullets.push_back(bullet);
     }
 }
 

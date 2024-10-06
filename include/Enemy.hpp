@@ -27,13 +27,14 @@ class Enemy : public Entity {
     ~Enemy();
 
     virtual void fire();
-    virtual void update(std::vector<Projectile>& bullets);
+    virtual void update(std::vector<Projectile*>& bullets, int frame);
     virtual void die();
     static void create_enemies(std::vector<Enemy>& enemies, int n);
 
   protected:
     e_state state;
     int ticks;
+    int shoot;
 
   private:
 };

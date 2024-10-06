@@ -38,8 +38,8 @@ void display_story(GameConfig& config, int rows, int cols) {
     if ((int)config.intro.size() > rows) {
         attron(A_BLINK);
         mvprintw(i + 1, 15, "%s", "Press Any Keys To Continue");
-        attroff(A_BLINK);
         refresh();
+        attroff(A_BLINK);
     } else {
         for (const std::string& line : config.intro) {
             mvprintw(i + 1, 15, "%s", line.c_str());
@@ -78,19 +78,24 @@ int main(int ac, char** av) {
 
     Game world;
     world.status = STORY;
-    init_screen(world);
-    mvwprintw(stdscr, 0, 1, "ft_shmup");
+    init_screen();
+    // mvwprintw(stdscr, 0, 1, "ft_shmup");
     refresh();
-    wrefresh(world.main);
     if (world.status == STORY) {
         display_story(config, LINES, COLS);
         world.status = MENU;
     }
+    init_windows(world);
+    wrefresh(world.main);
     nodelay(stdscr, TRUE);  // non-blocking getch
     initialize_world(world);
 
     Texture skin(10, 3, "~>L-\\___  ~XE[]==O}>~>F-/```  ");
     Player p(Point(1, 15), 10, 10, skin);
+    Texture bullet_tex(1, 1, "-");
+    Texture laser_icon(3, 3, ",_,|!|```");
+    Weapon *laser = new Weapon(laser_icon, 1000, 1, bullet_tex, 3);
+    p.set_weapon(laser);
     p.current_regions.clear();  // Clear current regions before updating
     for (Region r : world.regions) {
         if (true || r.is_point_inside(p.get_position())) {
@@ -113,24 +118,24 @@ static void game_loop(Game& world, Player& p) {
     int ch;
     int i = 0;
     std::vector<Enemy> enemies;
-    Enemy::create_enemies(enemies, 5);
-    std::vector<Projectile> bullets;
+    Enemy::create_enemies(enemies, 20);
+    std::vector<Projectile*> bullets;
     while (true) {
         for (std::vector<Enemy>::iterator it = enemies.begin();
              it != enemies.end(); ++it) {
-            it->update(bullets);
+            it->update(bullets, i);
             put_entity(world.main, *it);
         }
-        for (std::vector<Projectile>::iterator it = bullets.begin();
+        for (std::vector<Projectile*>::iterator it = bullets.begin();
              it != bullets.end(); ++it) {
-            it->update();
+            (*it)->update();
             put_projectile(world.main, *it);
         }
         ch = wgetch(world.main);
-        if (i >= 5) {
+        if (!(i & 3)) {
             wclear(world.main);
             wclear(world.hud);
-            i = 0;
+            // i = 0;
         }
         // if (ch != ERR) {
         switch (ch) {
@@ -152,11 +157,13 @@ static void game_loop(Game& world, Player& p) {
                 break;
             case ' ':
                 // mvwprintw(world.main, 10, 40, "KEY_SPACE");
-                p.fire();
+                p.fire(bullets, i);
                 break;
             case 10:  // Enter key
                 break;
             case 27:  // Escape key
+                for (auto bullet : bullets)
+                    delete bullet;
                 cleanup_and_exit();
                 break;
             default:
@@ -173,7 +180,7 @@ static void game_loop(Game& world, Player& p) {
             for (Region region : p.current_regions) {
                 regions_str += std::to_string(region.id) + " ";
             }
-            mvwprintw(world.hud, 1, 1, regions_str.c_str());
+            mvwprintw(world.hud, 1, 1, "%s", regions_str.c_str());
         }
         int row = 1;  // Start displaying regions from the second row
         for (const Region& region : world.regions) {

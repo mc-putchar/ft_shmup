@@ -27,7 +27,7 @@ class Player : public Entity {
         Point const&
             direction);  // TODO: fix problem with diff definition of move function
     void attack(Entity& target);
-    void fire(void);
+    void fire(std::vector<Projectile*>& bullets, int frame);
     void take_damage(int amount);
 
   private:

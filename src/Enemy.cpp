@@ -36,17 +36,22 @@ Enemy::~Enemy() {}
 
 void Enemy::fire() {
     if (this->weapon) {
-        (void)this->weapon->shoot(this->direction, this->position, 0);
+        (void)this->weapon->shoot(this->direction,
+                                  this->position - Point(-1, 0), 0);
     }
 }
 
-void Enemy::update(std::vector<Projectile>& bullets) {
-    // Point next_dir(3, 2);
-    // this->set_direction(next_dir);
-    if (++this->ticks < 5) return;
+void Enemy::update(std::vector<Projectile*>& bullets, int frame) {
+    if (++this->ticks < 10)
+        return;
     this->ticks = 0;
     this->Entity::move();
     if (this->weapon) {
+        Projectile* p =
+            this->weapon->shoot(Point(-1, 0), this->position, frame);
+        if (p) {
+            bullets.push_back(p);
+        }
     }
 }
 
@@ -61,7 +66,7 @@ void Enemy::create_enemies(std::vector<Enemy>& enemies, int n) {
     // ```
     Texture bullet_tex(1, 1, "-");
     Texture laser_icon(3, 3, ",_,|!|```");
-    Weapon laser(laser_icon, 1000, 1, bullet_tex, 1);
+    Weapon laser(laser_icon, 1000, 1, bullet_tex, 3);
     Texture pisciner_tex(7, 1, " (0){~ ");
     Texture peer_tex(5, 3, " -\\  <=B~  -/  ");
     int16_t x(180);
@@ -75,6 +80,7 @@ void Enemy::create_enemies(std::vector<Enemy>& enemies, int n) {
         enemies.push_back(enemy);
         x += 15;
     }
+    x = 240;
     for (int i = 0; i < n / 2; ++i) {
         Point p(x, 10);
         Enemy enemy(p, 5, 0, peer_tex);

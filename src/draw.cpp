@@ -4,10 +4,7 @@
 #include "Game.hpp"
 #include "Weapon.hpp"
 
-void init_screen(Game& game) {
-    int sx;
-    int sy;
-
+void init_screen(void) {
     initscr();
     raw();
     keypad(stdscr, TRUE);
@@ -24,6 +21,12 @@ void init_screen(Game& game) {
     init_pair(5, COLOR_BLUE, COLOR_BLACK);     // color pair 5
     init_pair(6, COLOR_MAGENTA, COLOR_BLACK);  // color pair 6
     init_pair(7, COLOR_WHITE, COLOR_BLACK);    // color pair 7
+}
+
+void init_windows(Game& game) {
+    int sx;
+    int sy;
+
     getmaxyx(stdscr, sy, sx);
     game.main = newwin((sy / 4) * 3, sx, 0,
                        0);  // Create a new window for the game world
@@ -45,10 +48,10 @@ void put_entity(WINDOW* win, Entity const& entity) {
     }
 }
 
-void put_projectile(WINDOW* win, Projectile const& p) {
-    Point pos(p.get_position());
-    Point size(p.get_size());
-    char const* tex(p.get_texture().data.c_str());
+void put_projectile(WINDOW* win, Projectile* p) {
+    Point pos(p->get_position());
+    Point size(p->get_size());
+    char const* tex(p->get_texture().data.c_str());
     for (uint16_t i = 0; i < size.y; ++i) {
         mvwprintw(win, pos.x, pos.y, "%.*s", size.x, &(tex[i * size.x]));
     }

@@ -54,7 +54,7 @@ class Weapon {
     Texture const& get_icon() const;
 
     void do_damage(Entity& target);
-    bool shoot(Point const& dir, Point const& start, uint32_t time);
+    Projectile* shoot(Point const& dir, Point const& start, uint32_t time);
 
   private:
     uint32_t last_shot;
