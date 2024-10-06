@@ -72,17 +72,12 @@ typedef struct {
 
 void fillBackground(WINDOW *my_pad)
 {
-	const wchar_t *blocks[] = {L"█", L"▓", L"▒", L"░"};
-	int numBlocks = sizeof(blocks) / sizeof(blocks[0]);
 
 	for (int y = 1; y < LINES; ++y) {
         for (int x = 0; x < COLS * 2; ++x) {
-			const wchar_t *bl = blocks[rand() % numBlocks];
 			int colorPair = 1 + rand() % 3;
-			// uint8_t ch = rand() % 128;
-		
 			wattrset(my_pad, COLOR_PAIR(colorPair));
-            mvwaddwstr(my_pad, y, x, blocks[0]); 
+            mvwaddwstr(my_pad, y, x, L"█"); 
 			wattroff(my_pad, COLOR_PAIR(colorPair));
         }
     }
@@ -92,8 +87,6 @@ void fillBackground(WINDOW *my_pad)
     //         mvwaddch(my_pad, y, x, ch); // 
     //     }
     // }
-
-
 } 
 
 int main(int ac, char** av) {
