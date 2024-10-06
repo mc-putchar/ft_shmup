@@ -5,7 +5,7 @@ SRCDIR := src
 INCDIR := include
 BINDIR := build
 
-SRCS := main GameConfig
+SRCS := main draw Entity Enemy Weapon GameConfig
 
 BINS := $(SRCS:%=$(BINDIR)/%.o)
 
