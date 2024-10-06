@@ -11,10 +11,11 @@
 #pragma once
 
 #include <curses.h>
-
 #include <vector>
 
 class Entity;
+class Enemy;
+class Projectile;
 struct Point;
 struct Game;
 
@@ -42,7 +43,9 @@ struct Game {
     WINDOW* main;
     WINDOW* hud;
 
-    std::vector<Region> regions;
-    Region get_region_by_id(int id) const;
+    // std::vector<Region> regions;
+    // Region get_region_by_id(int id) const;
+    std::vector<Enemy> enemies;
+    std::vector<Projectile> bullets;
     e_gamestatus status;
 };
