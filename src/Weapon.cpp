@@ -19,7 +19,8 @@ Projectile::Projectile(Texture const& tex, Point const& pos, Point const& dir,
       position(pos),
       direction(dir),
       damage(damage),
-      speed(speed) {}
+      speed(speed),
+      active(true) {}
 
 Projectile::~Projectile() {}
 

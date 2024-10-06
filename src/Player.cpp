@@ -56,8 +56,8 @@ Player::~Player() {
 void Player::fire(std::vector<Projectile*>& bullets, int frame) {
     Point firepoint;
 
-    firepoint.x = this->position.y + this->texture.width;
-    firepoint.y = this->position.x + (this->texture.height / 2);
+    firepoint.x = this->position.y + (this->texture.height / 2);
+    firepoint.y = this->position.x + this->texture.width;
     if (this->weapon) {
         Projectile* bullet =
             this->weapon->shoot(Point(0, 1), firepoint, frame);

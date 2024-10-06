@@ -31,6 +31,7 @@ class Projectile {
     void set_direction(Point const& new_dir);
 
     void update();
+    bool active;
 
   private:
     Texture texture;

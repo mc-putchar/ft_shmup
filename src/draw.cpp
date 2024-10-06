@@ -49,7 +49,15 @@ void put_entity(WINDOW* win, Entity const& entity) {
 }
 
 void put_projectile(WINDOW* win, Projectile* p) {
+    int sx;
+    int sy;
+
+    getmaxyx(win, sy, sx);
     Point pos(p->get_position());
+    if (pos.y < 0 || pos.y >= sx || pos.x < 0 || pos.x >= sy) {
+        p->active = false;
+        return;
+    }
     Point size(p->get_size());
     char const* tex(p->get_texture().data.c_str());
     for (uint16_t i = 0; i < size.y; ++i) {

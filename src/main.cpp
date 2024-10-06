@@ -123,6 +123,14 @@ static void game_loop(Game& world, Player& p) {
             (*it)->update();
             put_projectile(world.main, *it);
         }
+        for (auto bullet : world.bullets) {
+            if (!bullet->active) {
+                world.bullets.erase(std::remove(world.bullets.begin(),
+                                                world.bullets.end(), bullet),
+                                    world.bullets.end());
+                delete bullet;
+            }
+        }
         ch = wgetch(world.main);
         if (!(i & 3)) {
             wclear(world.main);
