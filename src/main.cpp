@@ -2,15 +2,16 @@
 #include <fcntl.h>
 #include <ncurses.h>
 #include <unistd.h>  // for usleep
+
 #include <algorithm>
 #include <chrono>
 #include <csignal>
-#include <cstdint>
 #include <cstdio>
 #include <cstdlib>  // for system()
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <mutex>
 #include <thread>
 
 #include "Enemy.hpp"
@@ -20,6 +21,10 @@
 #include "Player.hpp"
 #include "Weapon.hpp"
 #include "ft_shmup.hpp"
+
+pthread_mutex_t key_pressed_mtx = PTHREAD_MUTEX_INITIALIZER;
+
+static void game_loop(Game& world, Player& p);
 
 namespace ft_shmup {
 static volatile std::sig_atomic_t g_stop;
@@ -67,123 +72,74 @@ int main(int ac, char** av) {
     if (ac > 1)
         std::cout << "Usage: " << av[0] << std::endl;
 
-    std::signal(SIGINT, ft_shmup::stop_game);
-    std::signal(SIGTERM, ft_shmup::stop_game);
-    usleep(100000);  // give time to alacritty to set up the terminal
-    GameConfig& config = GameConfig::getConf();
-    GameParams params;
-
-    // init_game();
-    Game game;
-    init_screen(game);
-
-    params.fps = 60.0;
-    params.startTime = std::chrono::high_resolution_clock::now();
-    // auto lastTime = startTime;
-    int c = 0;
-    WINDOW* my_pad = newpad(LINES, 300);
-    for (int y = 0; y < 3; ++y) {
-        for (int x = 0; x < COLS * 2; ++x) {
-            uint8_t ch = get_wall_piece(rand() % 128);
-            mvwaddch(my_pad, y, x, ch);  //
-        }
-    }
-    for (int y = LINES - 1; y > LINES - 5; --y) {
-        for (int x = 0; x < COLS * 2; ++x) {
-            uint8_t ch = get_wall_piece(rand() % 128);
-            mvwaddch(my_pad, y, x, ch);  //
-        }
-    }
+    Game world;
+    init_screen(world);
+    mvwprintw(stdscr, 1, 1, "Hello, world!");
+    refresh();
+    wrefresh(world.main);
 
     Texture skin(10, 3, "~>L-\\___  ~XE[]==O}>~>F-/```  ");
     Player p(Point(20, 20), 10, 10, skin);
-    // p.move(stdscr, Point(0, 0));  // Draw player at start position
+    p.move(world.main, Point(0, 0));  // Draw player at start position
 
-    std::vector<Enemy> enemies;
-    Enemy::create_enemies(enemies, 5);
+    game_loop(world, p);
 
-    int offset = 0;
-    while ((c = getch()) != 27) {
-        if (!config.storyPlayed) {
-            nodelay(stdscr, FALSE);
-            display_story(config, LINES, COLS);
-            mvwprintw(stdscr, 0, LINES - 10, "%s", "ft_shmup");
-            if ((c) != 27 && (c) != ERR) {
-                config.storyPlayed = true;
-                nodelay(stdscr, TRUE);
-                continue;
-            } else if ((c) != ERR) {
-                break;
-            }
+    return 0;
+}
 
-        } else {
-            switch (c) {
-                case KEY_ESC:
-                    cleanup_and_exit();
-                    break;
-                case KEY_UP:
-                    // mvwprintw(stdscr, 10, 40, "KEY_UP");
-                    p.move(my_pad, Point(0, -1));
-                    break;
-                case KEY_DOWN:
-                    // mvwprintw(stdscr, 10, 40, "KEY_DOWN");
-                    p.move(my_pad, Point(0, 1));
-                    break;
-                case KEY_LEFT:
-                    // mvwprintw(stdscr, 10, 40, "KEY_LEFT");
-                    p.move(my_pad, Point(-1, 0));
-                    break;
-                case KEY_RIGHT:
-                    // mvwprintw(stdscr, 10, 40, "KEY_RIGHT");
-                    p.move(my_pad, Point(1, 0));
-                    break;
-                default:
-                    p.move(my_pad, Point(0, 0));
-                    break;
-            }
-            // werase(stdscr);
-            // pnoutrefresh(my_pad, 0, offset, 0, 0, LINES - 1, COLS - 1);
-
-            usleep(50000);
-            // p.move(my_pad, Point(offset, 0));
-            prefresh(my_pad, 0, offset, 0, 0, LINES - 1, COLS - 1);
-
-            char fpsStr[10];
-            snprintf(fpsStr, sizeof(fpsStr), "fps %.2f", params.fps);
-            mvwprintw(stdscr, 0, LINES - 10, "%s", fpsStr);
-
-            attron(COLOR_PAIR(1));
-            mvwprintw(stdscr, 0, 0, "Pressed: %d", c);
-            attroff(COLOR_PAIR(1));
-            refresh();
-
-            offset++;
-            if (offset >= COLS) {
-                offset = 0;
-            }
-
-            params.endTime = std::chrono::high_resolution_clock::now();
-            params.elapsedTime = params.endTime - params.startTime;
-            params.remainingTime =
-                std::chrono::duration<double>(1.0 / 60.0) - params.elapsedTime;
-            if (params.remainingTime > std::chrono::duration<double>(0.0)) {
-                std::this_thread::sleep_for(params.remainingTime);
-            } else {
-                mvwprintw(stdscr, 0, COLS - 10, "fps ...");
-            }
-
-            for (std::vector<Enemy>::iterator it = enemies.begin();
-                 it != enemies.end(); ++it) {
-                it->update();
-                put_entity(my_pad, *it);
-            }
+static void game_loop(Game& world, Player& p) {
+    nodelay(world.main, TRUE);  // Make wgetch non-blocking
+    nodelay(world.hud, TRUE);   // Make wgetch non-blocking
+    nodelay(stdscr, TRUE);      // Make wgetch non-blocking
+    int ch;
+    int i = 0;
+    while (true) {
+        ch = wgetch(world.main);
+        if (i >= 5) {
+            wclear(world.main);
+            wclear(world.hud);
+            i = 0;
         }
+        // if (ch != ERR) {
+        switch (ch) {
+            case 'w':
+                mvwprintw(world.main, 10, 40, "KEY_UP");
+                p.move(world.main, Point(0, -1));
+                break;
+            case 's':
+                mvwprintw(world.main, 10, 40, "KEY_DOWN");
+                p.move(world.main, Point(0, 1));
+                break;
+            case 'a':
+                mvwprintw(world.main, 10, 40, "KEY_LEFT");
+                p.move(world.main, Point(-1, 0));
+                break;
+            case 'd':
+                mvwprintw(world.main, 10, 40, "KEY_RIGHT");
+                p.move(world.main, Point(1, 0));
+                break;
+            case 10:  // Enter key
+                break;
+            case 27:  // Escape key
+                cleanup_and_exit();
+                break;
+            default:
+                p.move(world.main, Point(0, 0));
+                wborder(world.main, 0, 0, 0, 0, 0, 0, 0, 0);
+                wborder(world.hud, 0, 0, 0, 0, 0, 0, 0, 0);
+                break;
+        }
+        // }
+        refresh();
+        wrefresh(world.main);
+        wrefresh(world.hud);
+        usleep(10000);  // Sleep for 20ms
+        i++;
     }
-    cleanup_and_exit();
-    return (0);
 }
 
 int cleanup_and_exit(void) {
     endwin();
-    std::exit(0);
+    printf("Exiting...\n");
+    exit(0);
 }

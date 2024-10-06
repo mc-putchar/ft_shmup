@@ -18,11 +18,10 @@ void init_screen(Game& game) {
     noecho();
     start_color();                          // allow colors
     init_pair(1, COLOR_CYAN, COLOR_BLACK);  // color pair 1
-    getmaxyx(stdscr, sx, sy);
-    game.main = subwin(stdscr, sy / 2, sx, 0, 0);
-    game.hud = subwin(stdscr, sy / 2, sx, sy / 2, sx);
+    getmaxyx(stdscr, sy, sx);
+    game.main = newwin((sy / 4) * 3, sx, 0, 0);  // Create a new window for the game world
+    game.hud = newwin(sy / 4, sx, (sy / 4) * 3, 0);  // Create a new window for the HUD
     refresh();
-    border(0, 0, 0, 0, 0, 0, 0, 0);
     wborder(game.main, 0, 0, 0, 0, 0, 0, 0, 0);
     wborder(game.hud, 0, 0, 0, 0, 0, 0, 0, 0);
     wrefresh(game.main);
