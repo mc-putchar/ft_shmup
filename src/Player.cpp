@@ -53,9 +53,15 @@ Player::~Player() {
         delete this->weapon;
 }
 
+void Player::fire(void) {
+    if (this->weapon) {
+        (void)this->weapon->shoot(Point(1, 0), this->position, 0);
+    }
+}
+
 void Player::attack(Entity& target) {
     (void)target;
-}
+};
 
 void Player::take_damage(int amount) {}
 

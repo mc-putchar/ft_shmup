@@ -1,64 +1,89 @@
 #include <curses.h>
+#include <unistd.h>
 #include <cstdlib>
 #include <iostream>
+#include <mutex>
 #include <thread>
 #include "Entity.hpp"
 #include "Player.hpp"
 #include "ft_shmup.hpp"
 
+pthread_mutex_t key_pressed_mtx = PTHREAD_MUTEX_INITIALIZER;
+
+static void game_loop(Game& world, Player& p);
+
 int main(int ac, char** av) {
     if (ac > 1)
         std::cout << "Usage: " << av[0] << std::endl;
 
-    (void)initscr();
-    keypad(stdscr, TRUE);
-    (void)nonl();
-    (void)cbreak();
-    (void)noecho();
-    (void)curs_set(0);  // Disable cursor
+    Game world;
+    init_screen(world);
+    mvwprintw(stdscr, 1, 1, "Hello, world!");
+    refresh();
+    wrefresh(world.main);
 
     Texture skin(10, 3, "~>L-\\___  ~XE[]==O}>~>F-/```  ");
     Player p(Point(20, 20), 10, 10, skin);
-    p.move(stdscr, Point(0, 0));  // Draw player at start position
+    p.move(world.main, Point(0, 0));  // Draw player at start position
 
-    // Idea for control:
-    // - Detect key down and key up events
-    //    - If key down, toggle the flag for that key
-    //    - If key up, toggle the flag back to false fot that key
-    // - In the main loop, check the flags and move the player accordingly
+    game_loop(world, p);
 
-    // Primitive control loop
-    int c;
+    return 0;
+}
+
+static void game_loop(Game& world, Player& p) {
+    nodelay(world.main, TRUE);  // Make wgetch non-blocking
+    nodelay(world.hud, TRUE);   // Make wgetch non-blocking
+    nodelay(stdscr, TRUE);      // Make wgetch non-blocking
+    int ch;
+    int i = 0;
     while (true) {
-        c = wgetch(stdscr);
-        wclear(stdscr);
-        switch (c) {
-            case KEY_UP:
-                mvwprintw(stdscr, 10, 40, "KEY_UP");
-                p.move(stdscr, Point(0, -1));
+        ch = wgetch(world.main);
+        if (i >= 5) {
+            wclear(world.main);
+            wclear(world.hud);
+            i = 0;
+        }
+        // if (ch != ERR) {
+        switch (ch) {
+            case 'w':
+                mvwprintw(world.main, 10, 40, "KEY_UP");
+                p.move(world.main, Point(0, -1));
                 break;
-            case KEY_DOWN:
-                mvwprintw(stdscr, 10, 40, "KEY_DOWN");
-                p.move(stdscr, Point(0, 1));
+            case 's':
+                mvwprintw(world.main, 10, 40, "KEY_DOWN");
+                p.move(world.main, Point(0, 1));
                 break;
-            case KEY_LEFT:
-                mvwprintw(stdscr, 10, 40, "KEY_LEFT");
-                p.move(stdscr, Point(-1, 0));
+            case 'a':
+                mvwprintw(world.main, 10, 40, "KEY_LEFT");
+                p.move(world.main, Point(-1, 0));
                 break;
-            case KEY_RIGHT:
-                mvwprintw(stdscr, 10, 40, "KEY_RIGHT");
-                p.move(stdscr, Point(1, 0));
+            case 'd':
+                mvwprintw(world.main, 10, 40, "KEY_RIGHT");
+                p.move(world.main, Point(1, 0));
                 break;
-            case 27:
+            case 10:  // Enter key
+                break;
+            case 27:  // Escape key
                 cleanup_and_exit();
                 break;
+            default:
+                p.move(world.main, Point(0, 0));
+                wborder(world.main, 0, 0, 0, 0, 0, 0, 0, 0);
+                wborder(world.hud, 0, 0, 0, 0, 0, 0, 0, 0);
+                break;
         }
-        wrefresh(stdscr);
+        // }
+        refresh();
+        wrefresh(world.main);
+        wrefresh(world.hud);
+        usleep(10000);  // Sleep for 20ms
+        i++;
     }
-    cleanup_and_exit();
 }
 
 int cleanup_and_exit(void) {
     endwin();
+    printf("Exiting...\n");
     exit(0);
 }
