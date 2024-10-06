@@ -118,15 +118,13 @@ static void game_loop(Game& world, Player& p) {
     nodelay(stdscr, TRUE);      // Make wgetch non-blocking
     int ch;
     int i = 0;
-    std::vector<Enemy> enemies;
-    Enemy::create_enemies(enemies, 20);
-    std::vector<Projectile*> bullets;
+    Enemy::create_enemies(world.enemies, 20);
     while (true) {
         for (std::vector<Enemy>::iterator it = world.enemies.begin();
              it != world.enemies.end(); ++it) {
             Enemy* enemy = dynamic_cast<Enemy*>(&(*it));
             if (enemy) {
-                enemy->update(world.bullets);
+                enemy->update(world.bullets, i);
                 put_entity(world.main, *enemy);
             }
         }
@@ -161,12 +159,12 @@ static void game_loop(Game& world, Player& p) {
                 break;
             case ' ':
                 // mvwprintw(world.main, 10, 40, "KEY_SPACE");
-                p.fire(bullets, i);
+                p.fire(world.bullets, i);
                 break;
             case 10:  // Enter key
                 break;
             case 27:  // Escape key
-                for (auto bullet : bullets)
+                for (auto bullet : world.bullets)
                     delete bullet;
                 cleanup_and_exit();
                 break;
@@ -222,9 +220,9 @@ static int check_for_collision(Game const& world, Entity const& e) {
         }
     }
 
-    for (Projectile const& bullet : world.bullets) {
+    for (Projectile* bullet : world.bullets) {
         if (check_collision(e.get_position(), e.get_size(),
-                            bullet.get_position(), bullet.get_size())) {
+                            bullet->get_position(), bullet->get_size())) {
             return 1;
         }
     }

@@ -46,6 +46,6 @@ struct Game {
     // std::vector<Region> regions;
     // Region get_region_by_id(int id) const;
     std::vector<Enemy> enemies;
-    std::vector<Projectile> bullets;
+    std::vector<Projectile*> bullets;
     e_gamestatus status;
 };
