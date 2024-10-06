@@ -65,7 +65,15 @@ int main(int ac, char** av) {
     params.startTime = std::chrono::high_resolution_clock::now();
     // auto lastTime = startTime;
     int c = 0;
+	WINDOW* my_pad = newpad(LINES, 100);	
+	for (int y = 0; y < LINES; ++y) {
+        for (int x = 0; x < COLS * 2; ++x) {
+			uint8_t ch = rand() % 128;
+            mvwaddch(my_pad, y, x, ch); // 
+        }
+    }
 
+	int offset = 0;
     while (1) {
         if (!config.storyPlayed) {
             
@@ -76,8 +84,13 @@ int main(int ac, char** av) {
             }
             break;
         } else {
-            werase(stdscr);
-            char fpsStr[10];
+
+            // werase(stdscr);
+            // pnoutrefresh(my_pad, 0, offset, 0, 0, LINES - 1, COLS - 1);
+
+			prefresh(my_pad, 0, offset, 0, 0, LINES - 1, COLS - 1);
+
+			char fpsStr[10];
             snprintf(fpsStr, sizeof(fpsStr), "fps %.2f", params.fps);
             mvwprintw(stdscr, 0, LINES - 10, "%s", fpsStr);
 
@@ -85,10 +98,15 @@ int main(int ac, char** av) {
             mvwprintw(stdscr, 0, 0, "Pressed: %d", c);
             attroff(COLOR_PAIR(1));
 			refresh();
-			
-            c = getch();
-            if (c == 27)
-                break;
+
+			offset++;
+			if (offset >= COLS) {
+				offset = 0;
+			}
+            if ((c = getch()) == 27) {
+				break;
+            }
+
 
             params.endTime = std::chrono::high_resolution_clock::now();
             params.elapsedTime = params.endTime - params.startTime;
