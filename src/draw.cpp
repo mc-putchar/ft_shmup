@@ -11,16 +11,24 @@ void init_screen(Game& game) {
     initscr();
     raw();
     keypad(stdscr, TRUE);
-    nodelay(stdscr, TRUE);  // non-blocking getch
     curs_set(0);
     nonl();
     cbreak();
     noecho();
-    start_color();                          // allow colors
-    init_pair(1, COLOR_CYAN, COLOR_BLACK);  // color pair 1
+    setlocale(LC_ALL, "");
+    start_color();                             // allow colors
+    init_pair(1, COLOR_CYAN, COLOR_BLACK);     // color pair 1
+    init_pair(2, COLOR_RED, COLOR_BLACK);      // color pair 2
+    init_pair(3, COLOR_GREEN, COLOR_BLACK);    // color pair 3
+    init_pair(4, COLOR_YELLOW, COLOR_BLACK);   // color pair 4
+    init_pair(5, COLOR_BLUE, COLOR_BLACK);     // color pair 5
+    init_pair(6, COLOR_MAGENTA, COLOR_BLACK);  // color pair 6
+    init_pair(7, COLOR_WHITE, COLOR_BLACK);    // color pair 7
     getmaxyx(stdscr, sy, sx);
-    game.main = newwin((sy / 4) * 3, sx, 0, 0);  // Create a new window for the game world
-    game.hud = newwin(sy / 4, sx, (sy / 4) * 3, 0);  // Create a new window for the HUD
+    game.main = newwin((sy / 4) * 3, sx, 0,
+                       0);  // Create a new window for the game world
+    game.hud =
+        newwin(sy / 4, sx, (sy / 4) * 3, 0);  // Create a new window for the HUD
     refresh();
     wborder(game.main, 0, 0, 0, 0, 0, 0, 0, 0);
     wborder(game.hud, 0, 0, 0, 0, 0, 0, 0, 0);

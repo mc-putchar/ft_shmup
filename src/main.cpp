@@ -1,4 +1,5 @@
 
+#include <curses.h>
 #include <fcntl.h>
 #include <ncurses.h>
 #include <unistd.h>  // for usleep
@@ -13,6 +14,7 @@
 #include <iostream>
 #include <mutex>
 #include <thread>
+#include <vector>
 
 #include "Enemy.hpp"
 #include "Entity.hpp"
@@ -26,15 +28,6 @@ pthread_mutex_t key_pressed_mtx = PTHREAD_MUTEX_INITIALIZER;
 
 static void game_loop(Game& world, Player& p);
 
-namespace ft_shmup {
-static volatile std::sig_atomic_t g_stop;
-void stop_game(int sig) {
-    (void)sig;
-    g_stop = 1;
-    cleanup_and_exit();
-}
-}  // namespace ft_shmup
-
 void display_story(GameConfig& config, int rows, int cols) {
     (void)cols;
     std::string line;
@@ -43,7 +36,9 @@ void display_story(GameConfig& config, int rows, int cols) {
         mvprintw(0, 0, "...loading story...");
     }
     if ((int)config.intro.size() > rows) {
+        attron(A_BLINK);
         mvprintw(i + 1, 15, "%s", "Press Any Keys To Continue");
+        attroff(A_BLINK);
         refresh();
     } else {
         for (const std::string& line : config.intro) {
@@ -53,6 +48,7 @@ void display_story(GameConfig& config, int rows, int cols) {
             usleep(50000);
         }
     }
+    getch();
 }
 
 typedef struct {
@@ -72,11 +68,24 @@ int main(int ac, char** av) {
     if (ac > 1)
         std::cout << "Usage: " << av[0] << std::endl;
 
+    usleep(100000);  // give time to alacritty to set up the terminal
+
+    GameConfig& config = GameConfig::getConf();
+    GameParams params;
+    params.fps = 60.0;
+    params.startTime = std::chrono::high_resolution_clock::now();
+
     Game world;
+    world.status = STORY;
     init_screen(world);
-    mvwprintw(stdscr, 1, 1, "Hello, world!");
+    mvwprintw(stdscr, 0, 1, "ft_shmup");
     refresh();
     wrefresh(world.main);
+    if (world.status == STORY) {
+        display_story(config, LINES, COLS);
+        world.status = MENU;
+    }
+    nodelay(stdscr, TRUE);  // non-blocking getch
 
     Texture skin(10, 3, "~>L-\\___  ~XE[]==O}>~>F-/```  ");
     Player p(Point(20, 20), 10, 10, skin);
@@ -93,7 +102,20 @@ static void game_loop(Game& world, Player& p) {
     nodelay(stdscr, TRUE);      // Make wgetch non-blocking
     int ch;
     int i = 0;
+    std::vector<Enemy> enemies;
+    Enemy::create_enemies(enemies, 5);
+    std::vector<Projectile> bullets;
     while (true) {
+        for (std::vector<Enemy>::iterator it = enemies.begin();
+             it != enemies.end(); ++it) {
+            it->update(bullets);
+            put_entity(world.main, *it);
+        }
+        for (std::vector<Projectile>::iterator it = bullets.begin();
+             it != bullets.end(); ++it) {
+            it->update();
+            put_projectile(world.main, *it);
+        }
         ch = wgetch(world.main);
         if (i >= 5) {
             wclear(world.main);
@@ -103,20 +125,24 @@ static void game_loop(Game& world, Player& p) {
         // if (ch != ERR) {
         switch (ch) {
             case 'w':
-                mvwprintw(world.main, 10, 40, "KEY_UP");
+                // mvwprintw(world.main, 10, 40, "KEY_UP");
                 p.move(world.main, Point(0, -1));
                 break;
             case 's':
-                mvwprintw(world.main, 10, 40, "KEY_DOWN");
+                // mvwprintw(world.main, 10, 40, "KEY_DOWN");
                 p.move(world.main, Point(0, 1));
                 break;
             case 'a':
-                mvwprintw(world.main, 10, 40, "KEY_LEFT");
+                // mvwprintw(world.main, 10, 40, "KEY_LEFT");
                 p.move(world.main, Point(-1, 0));
                 break;
             case 'd':
-                mvwprintw(world.main, 10, 40, "KEY_RIGHT");
+                // mvwprintw(world.main, 10, 40, "KEY_RIGHT");
                 p.move(world.main, Point(1, 0));
+                break;
+            case ' ':
+                // mvwprintw(world.main, 10, 40, "KEY_SPACE");
+                p.fire();
                 break;
             case 10:  // Enter key
                 break;

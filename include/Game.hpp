@@ -11,8 +11,16 @@
 #pragma once
 #include <curses.h>
 
+enum e_gamestatus {
+    STORY,
+    MENU,
+    PLAY,
+    GAMEOVER
+};
+
 class Game {
   public:
     WINDOW* main;
     WINDOW* hud;
+    e_gamestatus status;
 };

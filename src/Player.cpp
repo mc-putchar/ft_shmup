@@ -68,8 +68,8 @@ void Player::take_damage(int amount) {}
 void Player::move(WINDOW* win, Point const& direction) {
     uint16_t mw, mh;
     getmaxyx(win, mh, mw);
-    mvwprintw(win, 5, 5, "max: %d %d, pos: %d %d\n", mw, mh, this->position.x,
-              this->position.y);
+    // mvwprintw(win, 5, 5, "max: %d %d, pos: %d %d\n", mw, mh, this->position.x,
+    //           this->position.y);
     if (this->position.x + direction.x + this->texture.width >= mw ||
         this->position.x + direction.x <= 0 ||
         this->position.y + direction.y + this->texture.height >= mh ||

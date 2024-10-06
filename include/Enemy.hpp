@@ -26,9 +26,8 @@ class Enemy : public Entity {
     Enemy& operator=(Enemy const& rhs);
     ~Enemy();
 
-    virtual void attack(Entity& target);
     virtual void fire();
-    virtual void update();
+    virtual void update(std::vector<Projectile>& bullets);
     virtual void die();
     static void create_enemies(std::vector<Enemy>& enemies, int n);
 
