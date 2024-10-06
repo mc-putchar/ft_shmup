@@ -61,11 +61,13 @@ int main(int ac, char** av) {
 
     init_game();
  
+	nodelay(stdscr, TRUE); // non-blocking getch
+
     params.fps = 60.0;
     params.startTime = std::chrono::high_resolution_clock::now();
     // auto lastTime = startTime;
     int c = 0;
-	WINDOW* my_pad = newpad(LINES, 100);	
+	WINDOW* my_pad = newpad(LINES, 300);	
 	for (int y = 0; y < LINES; ++y) {
         for (int x = 0; x < COLS * 2; ++x) {
 			uint8_t ch = rand() % 128;
@@ -74,19 +76,27 @@ int main(int ac, char** av) {
     }
 
 	int offset = 0;
-    while (1) {
+    while ((c = getch()) != 27) {
         if (!config.storyPlayed) {
-            
+			nodelay(stdscr, FALSE); 
             display_story(config, LINES, COLS);
-            if ((c = getch()) != 27) {
+			mvwprintw(stdscr, 0, LINES - 10, "%s", "hello");
+            if ((c) != 27 && (c) != ERR) {
                 config.storyPlayed = true;
+				nodelay(stdscr, TRUE); 
                 continue;
-            }
-            break;
+            } else if ((c) != ERR) {
+				break;
+			}
+       
         } else {
-
+			if (c == 27) {
+				break;
+			}
             // werase(stdscr);
             // pnoutrefresh(my_pad, 0, offset, 0, 0, LINES - 1, COLS - 1);
+
+			usleep(50000);
 
 			prefresh(my_pad, 0, offset, 0, 0, LINES - 1, COLS - 1);
 
@@ -103,10 +113,6 @@ int main(int ac, char** av) {
 			if (offset >= COLS) {
 				offset = 0;
 			}
-            if ((c = getch()) == 27) {
-				break;
-            }
-
 
             params.endTime = std::chrono::high_resolution_clock::now();
             params.elapsedTime = params.endTime - params.startTime;
