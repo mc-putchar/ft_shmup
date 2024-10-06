@@ -12,8 +12,6 @@
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
-#include <mutex>
-#include <thread>
 #include <vector>
 
 #include "Enemy.hpp"
@@ -24,10 +22,11 @@
 #include "Weapon.hpp"
 #include "ft_shmup.hpp"
 
-pthread_mutex_t key_pressed_mtx = PTHREAD_MUTEX_INITIALIZER;
+int64_t g_score = 0;
 
 static void game_loop(Game& world, Player& p);
 static int check_for_collision(Game& world, Entity const& e);
+static void display_hud(Game& world, Player& p);
 
 void display_story(GameConfig& config, int rows, int cols) {
     (void)cols;
@@ -169,7 +168,7 @@ static void game_loop(Game& world, Player& p) {
             default:
                 p.move(world, Point(0, 0));
                 wborder(world.main, 0, 0, 0, 0, 0, 0, 0, 0);
-                wborder(world.hud, 0, 0, 0, 0, 0, 0, 0, 0);
+                display_hud(world, p);
                 break;
         }
         // }
@@ -179,10 +178,13 @@ static void game_loop(Game& world, Player& p) {
         usleep(10000);  // Sleep for 20ms
         i++;
         if (check_for_collision(world, p) == 1) {
-            mvwprintw(world.main, 10, 40, "GAME OVER");
-            wrefresh(world.main);
-            usleep(1000000);
-            cleanup_and_exit();
+            p.set_health(p.get_health() - 1);
+            if (p.get_health() == 0) {
+                mvwprintw(world.main, 1, 1, "GAME OVER");
+                wrefresh(world.main);
+                usleep(1000000);
+                cleanup_and_exit();
+            }
         }
     }
 }
@@ -214,6 +216,9 @@ static int check_for_collision(Game& world, Entity const& e) {
     for (Enemy const& enemy : world.enemies) {
         if (check_collision(e.get_position(), e.get_size(),
                             enemy.get_position(), enemy.get_size())) {
+            world.enemies.erase(
+                std::remove(world.enemies.begin(), world.enemies.end(), enemy),
+                world.enemies.end());
             return 1;
         }
     }
@@ -221,6 +226,9 @@ static int check_for_collision(Game& world, Entity const& e) {
     for (Projectile* bullet : world.bullets) {
         if (check_collision(e.get_position(), e.get_size(),
                             bullet->get_position(), bullet->get_size())) {
+            world.bullets.erase(
+                std::remove(world.bullets.begin(), world.bullets.end(), bullet),
+                world.bullets.end());
             return 1;
         }
     }
@@ -235,11 +243,20 @@ static int check_for_collision(Game& world, Entity const& e) {
                 world.bullets.erase(std::remove(world.bullets.begin(),
                                                 world.bullets.end(), bullet),
                                     world.bullets.end());
+                g_score += 10;
             }
         }
     }
 
     return (0);
+}
+
+static void display_hud(Game& world, Player& p) {
+    mvwprintw(world.hud, 1, 1, "Health: %d", p.get_health());
+    mvwprintw(world.hud, 2, 1, "FPS: 60");
+    mvwprintw(world.hud, 3, 1, "Score: %ld", g_score);
+    wborder(world.hud, 0, 0, 0, 0, 0, 0, 0, 0);
+    wrefresh(world.hud);
 }
 
 int cleanup_and_exit(void) {
