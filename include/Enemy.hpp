@@ -13,14 +13,14 @@
 #include "Entity.hpp"
 #include "Weapon.hpp"
 
-#define ROCKET	"🚀"
-#define PISCINER	"🤿"
+#define ROCKET "🚀"
+#define PISCINER "🤿"
 
 enum e_state { SPAWNING, IDLE, ACTIVE, ATTACKING, DEFENDING, HURT, DEAD };
 
 class Enemy : public Entity {
   public:
-    Enemy(Point const& position, Point const& size, uint16_t hp, uint16_t sp,
+    Enemy(Point const& position, uint16_t hp, uint16_t sp,
           Texture const& texture);
     Enemy(Enemy const& cpy);
     Enemy& operator=(Enemy const& rhs);

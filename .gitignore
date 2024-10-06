@@ -1,7 +1,9 @@
 build/
+.cache/
 *.o
 *.d
 *.out
 en.subject.pdf
 ft_shmup
 .vscode/
+compile_commands.json

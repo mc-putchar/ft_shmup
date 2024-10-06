@@ -14,7 +14,7 @@ CXXFLAGS := -Wall -Wextra -std=c++11
 CPPFLAGS := -I$(INCDIR)
 LDFLAGS := -lncurses
 
-.PHONY: all, clean, fclean, re
+.PHONY: all, clean, fclean, re, run
 
 all: $(NAME)
 
@@ -34,4 +34,7 @@ fclean: clean
 	rm -f $(NAME)
 
 re: fclean all
+
+run: all
+	@./$(NAME)
 

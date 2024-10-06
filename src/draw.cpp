@@ -31,7 +31,7 @@ void put_entity(WINDOW* win, Entity const& entity) {
     Point s(entity.get_size());
     char const* tex(entity.get_texture().data.c_str());
     for (uint16_t i = 0; i < s.y; ++i) {
-        mvwprintw(win, p.x, p.y + i, "%.*s", s.x, &(tex[i * s.x]));
+        mvwprintw(win, p.y + i, p.x, "%.*s", s.x, &(tex[i * s.x]));
     }
 }
 

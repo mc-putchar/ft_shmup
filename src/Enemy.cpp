@@ -13,11 +13,11 @@
 
 #include "Enemy.hpp"
 
-Enemy::Enemy(Point const& position, Point const& size, uint16_t hp, uint16_t sp,
+Enemy::Enemy(Point const& position, uint16_t hp, uint16_t sp,
              Texture const& texture)
-    : Entity(position, hp, sp, texture) {}
+    : Entity(position, hp, sp, texture), state(SPAWNING) {    }
 
-Enemy::Enemy(Enemy const& cpy) : Entity(cpy) {}
+Enemy::Enemy(Enemy const& cpy) : Entity(cpy), state(cpy.state) {}
 
 Enemy& Enemy::operator=(Enemy const& rhs) {
     if (this == &rhs)
@@ -28,6 +28,7 @@ Enemy& Enemy::operator=(Enemy const& rhs) {
     this->health = rhs.health;
     this->shield = rhs.shield;
     this->texture = rhs.texture;
+    this->state = rhs.state;
     return *this;
 }
 
@@ -47,16 +48,19 @@ void Enemy::fire() {
 }
 
 void Enemy::update(void) {
-    Point next_dir(3, 2);
-    this->set_direction(next_dir);
+    // Point next_dir(3, 2);
+    // this->set_direction(next_dir);
     this->Entity::move();
-    for (std::vector<Projectile>::iterator it =
-             this->weapon->projectiles.begin();
-         it != this->weapon->projectiles.end(); ++it) {
-        it->update();
+    if (this->weapon) {
+        for (std::vector<Projectile>::iterator it =
+                this->weapon->projectiles.begin();
+            it != this->weapon->projectiles.end(); ++it) {
+            it->update();
+        }
     }
 }
 
 void Enemy::die(void) {
+    this->state = DEAD;
     return;
 }
