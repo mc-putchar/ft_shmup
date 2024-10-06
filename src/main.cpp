@@ -43,25 +43,33 @@ void init_game() {
     curs_set(0);   // do not show cursor
 }
 
+typedef struct {
+	double fps;
+	std::chrono::time_point<std::chrono::high_resolution_clock> startTime;
+    std::chrono::time_point<std::chrono::high_resolution_clock> endTime;
+	std::chrono::duration<double> elapsedTime;
+	std::chrono::duration<double> remainingTime;
+}	GameParams;
+
 int main(int ac, char** av) {
     if (ac > 1)
         std::cout << "Usage: " << av[0] << std::endl;
 
-    usleep(100000);
+    usleep(100000); // give time to alacritty to set up the terminal
     GameConfig& config = GameConfig::getConf();
+	GameParams params;
+
     init_game();
-    int rows, cols;
-    // int frameCount = 0;
-    double fps = 60.0;
-    auto startTime = std::chrono::high_resolution_clock::now();
+ 
+    params.fps = 60.0;
+    params.startTime = std::chrono::high_resolution_clock::now();
     // auto lastTime = startTime;
     int c = 0;
 
     while (1) {
         if (!config.storyPlayed) {
-            // werase(stdscr);
-            getmaxyx(stdscr, rows, cols);
-            display_story(config, rows, cols);
+            
+            display_story(config, LINES, COLS);
             if ((c = getch()) != 27) {
                 config.storyPlayed = true;
                 continue;
@@ -70,24 +78,25 @@ int main(int ac, char** av) {
         } else {
             werase(stdscr);
             char fpsStr[10];
-            snprintf(fpsStr, sizeof(fpsStr), "fps %.2f", fps);
-            mvwprintw(stdscr, 0, cols - 10, "%s", fpsStr);
+            snprintf(fpsStr, sizeof(fpsStr), "fps %.2f", params.fps);
+            mvwprintw(stdscr, 0, LINES - 10, "%s", fpsStr);
 
             attron(COLOR_PAIR(1));
             mvwprintw(stdscr, 0, 0, "Pressed: %d", c);
             attroff(COLOR_PAIR(1));
+			refresh();
+			
             c = getch();
             if (c == 27)
                 break;
 
-            auto endTime = std::chrono::high_resolution_clock::now();
-            std::chrono::duration<double> elapsedTime = endTime - startTime;
-            std::chrono::duration<double> remainingTime =
-                std::chrono::duration<double>(1.0 / 60.0) - elapsedTime;
-            if (remainingTime > std::chrono::duration<double>(0.0)) {
-                std::this_thread::sleep_for(remainingTime);
+            params.endTime = std::chrono::high_resolution_clock::now();
+            params.elapsedTime = params.endTime - params.startTime;
+            params.remainingTime = std::chrono::duration<double>(1.0 / 60.0) - params.elapsedTime;
+            if (params.remainingTime > std::chrono::duration<double>(0.0)) {
+                std::this_thread::sleep_for(params.remainingTime);
             } else {
-                mvwprintw(stdscr, 0, cols - 10, "fps ...");
+                mvwprintw(stdscr, 0, COLS - 10, "fps ...");
             }
         }
     }
