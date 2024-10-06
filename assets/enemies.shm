@@ -1,0 +1,73 @@
+# (0){~
+{
+	"class": "pisciner",
+	"size": "small",
+	"hullpoints": 2,
+	"speed": 5,
+	"agility": 5,
+	"num_states": 3,
+	"states": [
+		{
+			"name": "off",
+			"width": 6,
+			"height": 1,
+			"hull": " (0){ "
+		},
+		{
+			"name": "idle",
+			"width": 6,
+			"height": 1,
+			"hull": " (0){~"
+		},
+		{
+			"name": "shooting",
+			"width": 6,
+			"height": 1,
+			"hull": "-(0){~"
+		},
+		{
+			"name": "dead",
+			"width": 6,
+			"height": 1,
+			"hull": "( D- {"
+		}
+	],
+},
+
+#  -\ 
+# <=B~
+#  -/ 
+{
+	"class": "peer",
+	"size": "small",
+	"hullpoints": 4,
+	"speed": 5,
+	"agility": 5,
+	"num_states": 3,
+	"states": [
+		{
+			"name": "off",
+			"width": 4,
+			"height": 3,
+			"hull": " -\ <=B  -/ "
+		},
+		{
+			"name": "idle",
+			"width": 4,
+			"height": 3,
+			"hull": " -\ <=B~ -/ "
+		},
+		{
+			"name": "shooting",
+			"width": 4,
+			"height": 3,
+			"hull": "--\ <=B~--/ "
+		},
+		{
+			"name": "dead",
+			"width": 4,
+			"height": 3,
+			"hull": ""
+		}
+	],
+}

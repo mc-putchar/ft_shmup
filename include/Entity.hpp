@@ -17,10 +17,11 @@
 class Weapon;
 
 struct Point {
-    int16_t x;
-    int16_t y;
-    Point(int16_t x, int16_t y) : x(x), y(y) {};
-    Point(Point const& cpy) : x(cpy.x), y(cpy.y) {};
+    uint16_t x;
+    uint16_t y;
+    Point() : x(0), y(0) {};
+    Point(uint16_t x, uint16_t y) : x(x), y(y){};
+    Point(Point const& cpy) : x(cpy.x), y(cpy.y){};
     Point& operator=(Point const& rhs) {
         if (this == &rhs)
             return *this;
@@ -42,7 +43,9 @@ struct Point {
 
 struct Texture {
     Texture(uint16_t w, uint16_t h, std::string const& data)
-        : width(w), height(h), data(data) {}
+        : width(w), height(h), data(data){};
+    Texture(Texture const& cpy)
+        : width(cpy.width), height(cpy.height), data(cpy.data){};
     Texture& operator=(Texture const& rhs) {
         if (this == &rhs)
             return *this;
@@ -58,20 +61,25 @@ struct Texture {
 
 class Entity {
   public:
-    Entity(Point position, uint16_t hp, uint16_t sp, Texture texture,
-           Weapon* weapon);
+    Entity(Point const& position, Point const& size, uint16_t hp, uint16_t sp,
+           Texture const& texture);
+    Entity(Entity const& cpy);
+    Entity& operator=(Entity const& rhs);
     virtual ~Entity() = default;
-    virtual void move(WINDOW *win, Point const& direction);
+
+    virtual void move(void);
     virtual void take_damage(int amount);
     virtual void attack(Entity& target);
 
     Point const& get_position() const;
+    Point const& get_direction() const;
     Point get_size() const;
     uint16_t get_health() const;
     uint16_t get_shield() const;
-    Texture get_skin() const;
+    std::string const& get_texture() const;
 
     void set_position(Point const& new_position);
+    void set_direction(Point const& new_direction);
     void set_health(uint16_t hp);
     void set_shield(uint16_t sp);
     void set_skin(Texture const& skin);
@@ -79,6 +87,7 @@ class Entity {
 
   protected:
     Point position;
+    Point direction;
     uint16_t width;
     uint16_t height;
     uint16_t health;
