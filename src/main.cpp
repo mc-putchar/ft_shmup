@@ -86,11 +86,12 @@ int main(int ac, char** av) {
 
     while (true) {
         Texture skin(10, 3, "~>L-\\___  ~XE[]==O}>~>F-/```  ");
-        Player p(Point(1, 15), 10, 10, skin);
+        Player p(Point(1, 15), 3, 0, skin);
         Texture bullet_tex(1, 1, "-");
         Texture laser_icon(3, 3, ",_,|!|```");
         Weapon* laser = new Weapon(laser_icon, 1000, 1, bullet_tex, 3);
         p.set_weapon(laser);
+        g_score = 0;
 
         game_loop(world, p);
         if (draw_menu(world))
@@ -107,12 +108,14 @@ static void game_loop(Game& world, Player& p) {
     int i = 0;
     Enemy::create_enemies(world.enemies, 210);
     world.status = PLAY;
+    world.bullets.clear();
+    world.bullets.reserve(64);
     while (true) {
-        if (g_score == 300) {
+        if (g_score == 1500) {
             mvwprintw(world.main, 1, 1, "YOU WIN");
             wrefresh(world.main);
             usleep(1000000);
-            cleanup_and_exit();
+            cleanup_and_exit(world);
         }
         if (i % 123) {
             draw_background(world);
@@ -178,9 +181,7 @@ static void game_loop(Game& world, Player& p) {
             case 10:  // Enter key
                 break;
             case 27:  // Escape key
-                for (auto bullet : world.bullets)
-                    delete bullet;
-                cleanup_and_exit();
+                cleanup_and_exit(world);
                 break;
             default:
                 p.move(world, Point(0, 0));
@@ -197,40 +198,15 @@ static void game_loop(Game& world, Player& p) {
         if (check_for_collision(world, p) == 1) {
             p.set_health(p.get_health() - 1);
             if (p.get_health() == 0) {
+                for (auto bullet : world.bullets)
+                    delete bullet;
+                world.bullets.clear();
+                world.enemies.clear();
                 mvwprintw(world.main, 1, 1, "GAME OVER");
                 wrefresh(world.main);
                 usleep(1000000);
-                cleanup_and_exit();
+                return;
             }
-        }
-    }
-}
-
-// static int initialize_world(Game& world) {
-//     uint16_t mw, mh;
-//     uint16_t rg_height, rg_width;
-//     getmaxyx(world.main, mh, mw);
-//     rg_height = mh / 4;
-//     rg_width = mw / 4;
-//     // for (int i = 0; i < 16; ++i) {
-//     //     Region curr = Region(i);
-//     //     curr.width = rg_width;
-//     //     curr.height = rg_height;
-//     //     curr.origin_x = rg_width * (i % 4);
-//     //     curr.origin_y = rg_height * (i % 4);
-//     //     world.regions.push_back(curr);
-//     // }
-//     return (0);
-// }
-            for (auto bullet : world.bullets)
-                delete bullet;
-            world.bullets.clear();
-            world.enemies.clear();
-            mvwprintw(world.main, 10, 40, "GAME OVER");
-            wrefresh(world.main);
-            world.status = GAMEOVER;
-            usleep(1000000);
-            return;
         }
     }
 }
@@ -255,6 +231,7 @@ static int check_for_collision(Game& world, Entity const& e) {
     for (Projectile* bullet : world.bullets) {
         if (check_collision(e.get_position(), e.get_size(),
                             bullet->get_position(), bullet->get_size())) {
+            delete bullet;
             world.bullets.erase(
                 std::remove(world.bullets.begin(), world.bullets.end(), bullet),
                 world.bullets.end());
@@ -269,6 +246,7 @@ static int check_for_collision(Game& world, Entity const& e) {
                 world.enemies.erase(std::remove(world.enemies.begin(),
                                                 world.enemies.end(), enemy),
                                     world.enemies.end());
+                delete bullet;
                 world.bullets.erase(std::remove(world.bullets.begin(),
                                                 world.bullets.end(), bullet),
                                     world.bullets.end());
@@ -315,8 +293,13 @@ static void draw_background(Game const& world) {
     }
 }
 
-int cleanup_and_exit(void) {
+int cleanup_and_exit(Game& world) {
+    delwin(world.main);
+    delwin(world.hud);
     endwin();
-    printf("Exiting...\n");
+    for (auto bullet : world.bullets)
+        delete bullet;
+    world.bullets.clear();
+    world.enemies.clear();
     exit(0);
 }

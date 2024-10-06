@@ -10,7 +10,7 @@ SRCS := main draw Entity Enemy Weapon GameConfig Player Game
 BINS := $(SRCS:%=$(BINDIR)/%.o)
 
 CXX := c++
-CXXFLAGS := -Wall -Wextra -Werror -pedantic
+CXXFLAGS := -Wall -Wextra -Werror -pedantic -ggdb3 -Og
 CPPFLAGS := -I$(INCDIR)
 LDFLAGS := -lncurses
 
