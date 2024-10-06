@@ -10,12 +10,12 @@
 
 #include "Entity.hpp"
 
-Entity::Entity(Point const& position, Point const& size, uint16_t hp,
+Entity::Entity(Point const& position, uint16_t hp,
                uint16_t sp, Texture const& texture)
     : position(position),
       direction(),
-      width(size.x),
-      height(size.y),
+      width(texture.width),
+      height(texture.height),
       health(hp),
       shield(sp),
       texture(texture) {}
@@ -42,7 +42,7 @@ Entity& Entity::operator=(Entity const& rhs) {
     return *this;
 }
 
-void Entity::move(void) {
+void Entity::repos(void) {
     this->position += this->direction;
 }
 
@@ -79,8 +79,8 @@ uint16_t Entity::get_shield() const {
     return this->shield;
 }
 
-std::string const& Entity::get_texture() const {
-    return this->texture.data;
+Texture Entity::get_texture() const {
+    return this->texture;
 }
 
 void Entity::set_position(Point const& new_position) {
@@ -99,7 +99,7 @@ void Entity::set_shield(uint16_t sp) {
     this->shield = sp;
 }
 
-void Entity::set_skin(Texture const& texture) {
+void Entity::set_texture(Texture const& texture) {
     this->texture = texture;
 }
 
