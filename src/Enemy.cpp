@@ -47,8 +47,10 @@ void Enemy::update(std::vector<Projectile*>& bullets, int frame) {
     this->ticks = 0;
     this->Entity::repos();
     if (this->weapon) {
-        Projectile* p =
-            this->weapon->shoot(Point(-1, 0), this->position, frame);
+        Point firepos;
+        firepos.x = this->position.x - 3;
+        firepos.y = this->position.y + this->texture.height / 2;
+        Projectile* p = this->weapon->shoot(Point(-1, 0), firepos, frame);
         if (p) {
             bullets.push_back(p);
         }
@@ -72,22 +74,22 @@ void Enemy::create_enemies(std::vector<Enemy>& enemies, int n) {
     int16_t x(180);
     Point dir(-1, 0);
     for (int i = 0; i < n; ++i) {
-        Point p(x, 20);
+        Point p(x, ((i / 10) & 1) ? 10 : 20);
         Enemy enemy(p, 3, 0, pisciner_tex);
         enemy.set_direction(dir);
         Pisciner& pisciner = static_cast<Pisciner&>(enemy);
         pisciner.set_weapon(&laser);
         enemies.push_back(enemy);
-        x += 15;
+        x += 25;
     }
     x = 240;
     for (int i = 0; i < n / 2; ++i) {
-        Point p(x, 10);
+        Point p(x, (i & 1) ? 5 : ((i & 3) ? 15 : 10));
         Enemy enemy(p, 5, 0, peer_tex);
         enemy.set_direction(dir);
         Peer& peer = static_cast<Peer&>(enemy);
         peer.set_weapon(&laser);
         enemies.push_back(enemy);
-        x += 25;
+        x += 50;
     }
 }

@@ -39,9 +39,9 @@ void display_story(GameConfig& config, int rows, int cols) {
     }
     if ((int)config.intro.size() > rows) {
         attron(A_BLINK);
-        mvprintw(i + 1, 15, "%s", "Press Any Keys To Continue");
-        refresh();
+        mvprintw(i + 1, 16, "%s", "Press Any Keys To Continue");
         attroff(A_BLINK);
+        refresh();
     } else {
         for (const std::string& line : config.intro) {
             mvprintw(i + 1, 15, "%s", line.c_str());
@@ -75,7 +75,6 @@ int main(int ac, char** av) {
     Game world;
     world.status = STORY;
     init_screen();
-    // mvwprintw(stdscr, 0, 1, "ft_shmup");
     refresh();
     if (world.status == STORY) {
         display_story(config, LINES, COLS);
@@ -84,16 +83,20 @@ int main(int ac, char** av) {
     init_windows(world);
     wrefresh(world.main);
     nodelay(stdscr, TRUE);  // non-blocking getch
-    // initialize_world(world);
 
-    Texture skin(10, 3, "~>L-\\___  ~XE[]==O}>~>F-/```  ");
-    Player p(Point(1, 15), 10, 10, skin);
-    Texture bullet_tex(1, 1, "-");
-    Texture laser_icon(3, 3, ",_,|!|```");
-    Weapon* laser = new Weapon(laser_icon, 1000, 1, bullet_tex, 3);
-    p.set_weapon(laser);
+    while (true) {
+        Texture skin(10, 3, "~>L-\\___  ~XE[]==O}>~>F-/```  ");
+        Player p(Point(1, 15), 3, 0, skin);
+        Texture bullet_tex(1, 1, "-");
+        Texture laser_icon(3, 3, ",_,|!|```");
+        Weapon* laser = new Weapon(laser_icon, 1000, 1, bullet_tex, 3);
+        p.set_weapon(laser);
+        g_score = 0;
 
-    game_loop(world, p);
+        game_loop(world, p);
+        if (draw_menu(world))
+            break;
+    }
     return 0;
 }
 
@@ -103,13 +106,16 @@ static void game_loop(Game& world, Player& p) {
     nodelay(stdscr, TRUE);      // Make wgetch non-blocking
     int ch;
     int i = 0;
-    Enemy::create_enemies(world.enemies, 20);
+    Enemy::create_enemies(world.enemies, 210);
+    world.status = PLAY;
+    world.bullets.clear();
+    world.bullets.reserve(64);
     while (true) {
-        if (g_score == 300) {
+        if (g_score == 1500) {
             mvwprintw(world.main, 1, 1, "YOU WIN");
             wrefresh(world.main);
             usleep(1000000);
-            cleanup_and_exit();
+            cleanup_and_exit(world);
         }
         if (i % 123) {
             draw_background(world);
@@ -175,9 +181,7 @@ static void game_loop(Game& world, Player& p) {
             case 10:  // Enter key
                 break;
             case 27:  // Escape key
-                for (auto bullet : world.bullets)
-                    delete bullet;
-                cleanup_and_exit();
+                cleanup_and_exit(world);
                 break;
             default:
                 p.move(world, Point(0, 0));
@@ -194,31 +198,18 @@ static void game_loop(Game& world, Player& p) {
         if (check_for_collision(world, p) == 1) {
             p.set_health(p.get_health() - 1);
             if (p.get_health() == 0) {
+                for (auto bullet : world.bullets)
+                    delete bullet;
+                world.bullets.clear();
+                world.enemies.clear();
                 mvwprintw(world.main, 1, 1, "GAME OVER");
                 wrefresh(world.main);
                 usleep(1000000);
-                cleanup_and_exit();
+                return;
             }
         }
     }
 }
-
-// static int initialize_world(Game& world) {
-//     uint16_t mw, mh;
-//     uint16_t rg_height, rg_width;
-//     getmaxyx(world.main, mh, mw);
-//     rg_height = mh / 4;
-//     rg_width = mw / 4;
-//     // for (int i = 0; i < 16; ++i) {
-//     //     Region curr = Region(i);
-//     //     curr.width = rg_width;
-//     //     curr.height = rg_height;
-//     //     curr.origin_x = rg_width * (i % 4);
-//     //     curr.origin_y = rg_height * (i % 4);
-//     //     world.regions.push_back(curr);
-//     // }
-//     return (0);
-// }
 
 static int check_for_collision(Game& world, Entity const& e) {
     auto check_collision = [](Point const& p1, Point const& size1,
@@ -240,6 +231,7 @@ static int check_for_collision(Game& world, Entity const& e) {
     for (Projectile* bullet : world.bullets) {
         if (check_collision(e.get_position(), e.get_size(),
                             bullet->get_position(), bullet->get_size())) {
+            delete bullet;
             world.bullets.erase(
                 std::remove(world.bullets.begin(), world.bullets.end(), bullet),
                 world.bullets.end());
@@ -254,6 +246,7 @@ static int check_for_collision(Game& world, Entity const& e) {
                 world.enemies.erase(std::remove(world.enemies.begin(),
                                                 world.enemies.end(), enemy),
                                     world.enemies.end());
+                delete bullet;
                 world.bullets.erase(std::remove(world.bullets.begin(),
                                                 world.bullets.end(), bullet),
                                     world.bullets.end());
@@ -300,8 +293,13 @@ static void draw_background(Game const& world) {
     }
 }
 
-int cleanup_and_exit(void) {
+int cleanup_and_exit(Game& world) {
+    delwin(world.main);
+    delwin(world.hud);
     endwin();
-    printf("Exiting...\n");
+    for (auto bullet : world.bullets)
+        delete bullet;
+    world.bullets.clear();
+    world.enemies.clear();
     exit(0);
 }

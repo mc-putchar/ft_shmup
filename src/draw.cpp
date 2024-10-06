@@ -39,6 +39,25 @@ void init_windows(Game& game) {
     wrefresh(game.hud);
 }
 
+bool draw_menu(Game& game) {
+    int sx;
+    int sy;
+
+    wclear(game.main);
+    getmaxyx(game.main, sy, sx);
+    mvwprintw(game.main, sy / 2, sx / 2 - 4, "%s", "(n)ew game");
+    mvwprintw(game.main, sy / 2 + 4, sx / 2 - 2, "%s", "(e)xit");
+    wrefresh(game.main);
+    int c;
+    while (1) {
+        c = wgetch(game.main);
+        if (c == 27 || c == 'e')
+            return true;
+        if (c == 10 || c == 'n')
+            return false;
+    }
+}
+
 void put_entity(WINDOW* win, Entity const& entity) {
     Point p(entity.get_position());
     Point s(entity.get_size());
